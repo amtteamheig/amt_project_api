@@ -28,15 +28,15 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-      name: Deploy docker image
-      needs : test
-      steps:
-        - uses: actions/checkout@v2
-        - name: Build and push images
-          run: |
-            docker login ghcr.io -u dev-help2000 --password-stdin
-            docker build -t amt-project/gamification .
-            docker tag amt-project/gamification ghcr.io/amtproject/gamification
-            docker push ghcr.io/amtproject/gamification
+    name: Deploy docker image
+    needs : test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and push images
+        run: |
+          docker login ghcr.io -u dev-help2000 --password-stdin
+          docker build -t amt-project/gamification .
+          docker tag amt-project/gamification ghcr.io/amtproject/gamification
+          docker push ghcr.io/amtproject/gamification
 
 
