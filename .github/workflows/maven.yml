@@ -20,7 +20,7 @@ jobs:
         with:
           java-version: 11
       - name: Run app in docker
-        run: ./run_app.sh
+        run: ./run-app.sh
       - name: Run Specs test
         run: |
           cd gamification-specs
