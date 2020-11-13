@@ -48,5 +48,6 @@ jobs:
           docker build -t amt-project/gamification .
           docker tag amt-project/gamification ghcr.io/amtproject/gamification
           docker push ghcr.io/amtproject/gamification
+          
 
 
