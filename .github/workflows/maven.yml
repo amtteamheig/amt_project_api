@@ -12,23 +12,25 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name : build project
+    name: build project
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11
-    - name: Build impl with Maven
-      run: mvn -B package --file gamification-impl/pom.xml
-    - name: Build spec with Maven
-      run: mvn -B package --file gamification-specs/pom.xml
-    - name : Run Spring Boot
-      run : java -jar gamification-impl/target/gamification-impl-1.0.0.jar
-    - name : Run Specs test
-      run : |
-        cd gamification-specs
-        mvn test
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Build impl with Maven
+        run: mvn -B package --file gamification-impl/pom.xml
+      - name: Build spec with Maven
+        run: |
+          cd gamification-impl
+          mvn -B package
+      - name: Run Spring Boot
+        run: java -jar gamification-impl/target/gamification-impl-1.0.0.jar
+      - name: Run Specs test
+        run: |
+          cd gamification-specs
+          mvn test
 
 
 
