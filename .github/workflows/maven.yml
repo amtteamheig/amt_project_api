@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build and push images
         run: |
-          docker login ghcr.io -u dev-help2000 --password-stdin
+          echo ${{ secrets.HELP2000_PAT }} | docker login ghcr.io -u dev-help2000 --password-stdin
           docker build -t amt-project/gamification .
           docker tag amt-project/gamification ghcr.io/amtproject/gamification
           docker push ghcr.io/amtproject/gamification
