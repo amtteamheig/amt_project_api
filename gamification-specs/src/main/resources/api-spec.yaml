@@ -1,27 +1,27 @@
 openapi: '3.0.3'
 info:
   version: '0.1.0'
-  title: Fruits API
-  description: An API to demonstrate Swagger and Spring Boot
+  title: Gamification API
+  description: API of our gamification
 security:
   #  - bearerAuth: []
   - apiKeyAuth: []
 paths:
-  /fruits:
+  /badge:
     post:
-      description: create a fruit
-      operationId: createFruit
+      description: create a badge
+      operationId: createBadge
       requestBody:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Fruit'
+              $ref: '#/components/schemas/Badge'
       responses:
         '201':
           description: created
     get:
-      description: get the list of all fruits
-      operationId: getFruits
+      description: get the list of badges
+      operationId: getBadges
       responses:
         '200':
           description: success
@@ -30,11 +30,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Fruit'
-  /fruits/{id}:
+                  $ref: '#/components/schemas/Badge'
+  /badge/{id}:
     get:
-      description: get one fruit, by id
-      operationId: getFruit
+      description: get one badge, by id
+      operationId: getBadge
       parameters:
         - in: path
           name: id
@@ -47,7 +47,48 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Fruit'
+                $ref: '#/components/schemas/Badge'
+  /pointScale:
+    post:
+      description: create a pointScale
+      operationId: createPointScale
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/PointScale'
+      responses:
+        '201':
+          description: created
+    get:
+      description: get the list of pointScales
+      operationId: pointScale
+      responses:
+        '200':
+          description: success
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PointScale'
+  /pointScale/{id}:
+    get:
+      description: get one pointScale, by id
+      operationId: getPointScale
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: success
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/PointScale'
 components:
   securitySchemes:
     #    bearerAuth:            # arbitrary name for the security scheme
@@ -59,21 +100,22 @@ components:
       in: header
       name: X-API-KEY
   schemas:
-    Fruit:
+    PointScale:
       type: object
       properties:
         kind:
           type: string
-        colour:
+        points:
+          type: integer
+    Badge:
+      type: object
+      properties:
+        kind:
           type: string
-        size:
-          type: string
-        weight:
-          type: string
-        expirationDate:
+        obtainedDate:
           type: string
           format: date
           nullable: false
-        expirationDateTime:
+        imageUrl:
           type: string
-          format: date-time
+          nullable: true

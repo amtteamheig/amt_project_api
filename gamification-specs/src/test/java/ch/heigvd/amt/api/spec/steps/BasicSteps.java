@@ -3,7 +3,7 @@ package ch.heigvd.amt.api.spec.steps;
 import ch.heigvd.amt.ApiException;
 import ch.heigvd.amt.ApiResponse;
 import ch.heigvd.amt.api.DefaultApi;
-import ch.heigvd.amt.api.dto.Fruit;
+import ch.heigvd.amt.api.dto.Badge;
 import ch.heigvd.amt.api.spec.helpers.Environment;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -22,7 +22,7 @@ public class BasicSteps {
     private Environment environment;
     private DefaultApi api;
 
-    Fruit fruit;
+    Badge badge;
 
     private ApiResponse lastApiResponse;
     private ApiException lastApiException;
@@ -30,33 +30,29 @@ public class BasicSteps {
     private int lastStatusCode;
 
     private String lastReceivedLocationHeader;
-    private Fruit lastReceivedFruit;
 
     public BasicSteps(Environment environment) {
         this.environment = environment;
         this.api = environment.getApi();
     }
 
-    @Given("there is a Fruits server")
-    public void there_is_a_Fruits_server() throws Throwable {
+    @Given("there is a Gamification server")
+    public void there_is_a_Gamification_server() throws Throwable {
         assertNotNull(api);
     }
 
-    @Given("I have a fruit payload")
-    public void i_have_a_fruit_payload() throws Throwable {
-        fruit = new ch.heigvd.amt.api.dto.Fruit()
-          .kind("banana")
-          .colour("yellow")
-          .size("medium")
-          .weight("light")
-          .expirationDate(LocalDate.now())
-          .expirationDateTime(OffsetDateTime.now());
+    @Given("I have a badge payload")
+    public void i_have_a_badge_payload() throws Throwable {
+        badge = new ch.heigvd.amt.api.dto.Badge()
+                .kind("Diamond")
+                .obtainedDate(LocalDate.now())
+                .imageUrl("...");
     }
 
-    @When("^I POST the fruit payload to the /fruits endpoint$")
-    public void i_POST_the_fruit_payload_to_the_fruits_endpoint() throws Throwable {
+    @When("^I POST the badge payload to the /badges endpoint$")
+    public void i_POST_the_badge_payload_to_the_badges_endpoint() throws Throwable {
         try {
-            lastApiResponse = api.createFruitWithHttpInfo(fruit);
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -68,7 +64,7 @@ public class BasicSteps {
         assertEquals(expectedStatusCode, lastStatusCode);
     }
 
-    @When("^I send a GET to the /fruits endpoint$")
+    /*@When("^I send a GET to the /fruits endpoint$")
     public void iSendAGETToTheFruitsEndpoint() {
         try {
             lastApiResponse = api.getFruitsWithHttpInfo();
@@ -97,7 +93,7 @@ public class BasicSteps {
     @And("I receive a payload that is the same as the fruit payload")
     public void iReceiveAPayloadThatIsTheSameAsTheFruitPayload() {
         assertEquals(fruit, lastReceivedFruit);
-    }
+    }*/
 
     private void processApiResponse(ApiResponse apiResponse) {
         lastApiResponse = apiResponse;
