@@ -9,6 +9,6 @@ Feature: Basic operations on badges
     When I POST the badge payload to the /badges endpoint
     Then I receive a 201 status code
 
-#  Scenario: get the list of fruits
-#    When I send a GET to the /fruits endpoint
-#    Then I receive a 200 status code
+  Scenario: get the list of badges
+    When I send a GET to the /badges endpoint
+    Then I receive a 200 status code

@@ -31,6 +31,8 @@ public class BasicSteps {
 
     private String lastReceivedLocationHeader;
 
+    private Badge lastReceivedBadge;
+
     public BasicSteps(Environment environment) {
         this.environment = environment;
         this.api = environment.getApi();
@@ -64,10 +66,10 @@ public class BasicSteps {
         assertEquals(expectedStatusCode, lastStatusCode);
     }
 
-    /*@When("^I send a GET to the /fruits endpoint$")
+    @When("^I send a GET to the /badges endpoint$")
     public void iSendAGETToTheFruitsEndpoint() {
         try {
-            lastApiResponse = api.getFruitsWithHttpInfo();
+            lastApiResponse = api.getBadgesWithHttpInfo();
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -82,18 +84,18 @@ public class BasicSteps {
     public void iSendAGETToTheURLInTheLocationHeader() {
         Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
-            lastApiResponse = api.getFruitWithHttpInfo(id);
+            lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
-            lastReceivedFruit = (Fruit)lastApiResponse.getData();
+            lastReceivedBadge = (Badge) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
     }
 
-    @And("I receive a payload that is the same as the fruit payload")
+    @And("I receive a payload that is the same as the badge payload")
     public void iReceiveAPayloadThatIsTheSameAsTheFruitPayload() {
-        assertEquals(fruit, lastReceivedFruit);
-    }*/
+        assertEquals(badge, lastReceivedBadge);
+    }
 
     private void processApiResponse(ApiResponse apiResponse) {
         lastApiResponse = apiResponse;
