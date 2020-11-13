@@ -3,7 +3,6 @@ Feature: Basic operations on badges
   Background:
     Given there is a Gamification server
 
-  Scenario:
   Scenario: create a badge
     Given I have a badge payload
     When I POST the badge payload to the /badges endpoint

@@ -48,7 +48,7 @@ public class BasicSteps {
         badge = new ch.heigvd.amt.api.dto.Badge()
                 .kind("Diamond")
                 .obtainedDate(LocalDate.now())
-                .imageUrl("...");
+                .imageUrl("https://...");
     }
 
     @When("^I POST the badge payload to the /badges endpoint$")
@@ -67,7 +67,7 @@ public class BasicSteps {
     }
 
     @When("^I send a GET to the /badges endpoint$")
-    public void iSendAGETToTheFruitsEndpoint() {
+    public void iSendAGETToTheBadgesEndpoint() {
         try {
             lastApiResponse = api.getBadgesWithHttpInfo();
             processApiResponse(lastApiResponse);
@@ -93,7 +93,7 @@ public class BasicSteps {
     }
 
     @And("I receive a payload that is the same as the badge payload")
-    public void iReceiveAPayloadThatIsTheSameAsTheFruitPayload() {
+    public void iReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
         assertEquals(badge, lastReceivedBadge);
     }
 
