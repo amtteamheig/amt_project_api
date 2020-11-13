@@ -46,7 +46,13 @@ jobs:
         run: |
           echo ${{ secrets.REGISTERY_PAT }} | docker login ghcr.io -u dev-help2000 --password-stdin
           docker build -t amt-project/gamification .
+<<<<<<< HEAD
           docker tag amt-project/gamification ghcr.io/amtteamproject/gamification
           docker push ghcr.io/amtteamproject/gamification
+=======
+          docker tag amt-project/gamification ghcr.io/amtproject/gamification
+          docker push ghcr.io/amtproject/gamification
+          
+>>>>>>> bdc1494235279df25072d000d2028aca43841718
 
 
