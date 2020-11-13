@@ -22,7 +22,7 @@ public class SwaggerDocumentationConfig {
 
     ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("Fruits API")
+            .title("Gamification API")
             .description("An API to demonstrate Swagger and Spring Boot")
             .version("0.2.0")
             .build();
