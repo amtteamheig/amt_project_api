@@ -7,7 +7,7 @@ security:
   #  - bearerAuth: []
   - apiKeyAuth: []
 paths:
-  /badge:
+  /badges:
     post:
       description: create a badge
       operationId: createBadge
@@ -31,7 +31,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Badge'
-  /badge/{id}:
+  /badges/{id}:
     get:
       description: get one badge, by id
       operationId: getBadge
@@ -48,7 +48,7 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Badge'
-  /pointScale:
+  /pointScales:
     post:
       description: create a pointScale
       operationId: createPointScale
@@ -72,7 +72,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PointScale'
-  /pointScale/{id}:
+  /pointScales/{id}:
     get:
       description: get one pointScale, by id
       operationId: getPointScale
