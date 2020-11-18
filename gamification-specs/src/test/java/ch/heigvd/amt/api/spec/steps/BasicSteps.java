@@ -23,6 +23,7 @@ public class BasicSteps {
     private DefaultApi api;
 
     Badge badge;
+    PointScale pointScale;
 
     private ApiResponse lastApiResponse;
     private ApiException lastApiException;
@@ -32,6 +33,7 @@ public class BasicSteps {
     private String lastReceivedLocationHeader;
 
     private Badge lastReceivedBadge;
+    private PointScale lastReceivedPointScale;
 
     public BasicSteps(Environment environment) {
         this.environment = environment;
@@ -95,6 +97,23 @@ public class BasicSteps {
     @And("I receive a payload that is the same as the badge payload")
     public void iReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
         assertEquals(badge, lastReceivedBadge);
+    }
+
+    @Given("I have a pointScale payload")
+    public void i_have_a_pointScale_payload() throws Throwable {
+        pointScale = new ch.heigvd.amt.api.dto.PointScale()
+                .kind("Diamonds Category")
+                .points(10);
+    }
+
+    @When("^I POST the pointScale payload to the /pointScales endpoint$")
+    public void i_POST_the_pointScale_payload_to_the_pointScales_endpoint() throws Throwable {
+        try {
+            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
     }
 
     private void processApiResponse(ApiResponse apiResponse) {
