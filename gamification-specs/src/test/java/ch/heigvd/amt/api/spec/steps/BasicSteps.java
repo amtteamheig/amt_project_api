@@ -117,6 +117,16 @@ public class BasicSteps {
         }
     }
 
+    @When("^I send a GET to the /pointScales endpoint$")
+    public void iSendAGETToThePointScalesEndpoint() {
+        try {
+            lastApiResponse = api.getBadgesWithHttpInfo();
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
     private void processApiResponse(ApiResponse apiResponse) {
         lastApiResponse = apiResponse;
         lastApiCallThrewException = false;
