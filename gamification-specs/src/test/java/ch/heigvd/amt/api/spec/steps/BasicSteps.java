@@ -4,6 +4,7 @@ import ch.heigvd.amt.ApiException;
 import ch.heigvd.amt.ApiResponse;
 import ch.heigvd.amt.api.DefaultApi;
 import ch.heigvd.amt.api.dto.Badge;
+import ch.heigvd.amt.api.dto.PointScale;
 import ch.heigvd.amt.api.spec.helpers.Environment;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
