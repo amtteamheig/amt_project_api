@@ -25,6 +25,6 @@ Feature: Basic operations on badges
     When I POST the pointScale payload to the /pointScales endpoint
     Then I receive a 201 status code
 
-  Scenario: get the list of pointScale
-    When I send a GET to the /pointScales endpoint
-    Then I receive a 200 status code
+  #Scenario: get the list of pointScale
+  #  When I send a GET to the /pointScales endpoint
+  #  Then I receive a 200 status code
