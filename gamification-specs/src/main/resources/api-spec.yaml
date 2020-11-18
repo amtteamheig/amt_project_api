@@ -62,7 +62,7 @@ paths:
           description: created
     get:
       description: get the list of pointScales
-      operationId: pointScale
+      operationId: getPointScales
       responses:
         '200':
           description: success
