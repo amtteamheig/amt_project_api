@@ -3,6 +3,8 @@ version: '3.8'
 services:
   spring-boot:
     container_name: 'gamification-container'
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     build:
       context: .
       dockerfile: Dockerfile
