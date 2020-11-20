@@ -95,6 +95,17 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/PointScale'
+  /registration:
+    post:
+      description: registrate application
+      operationId: registerApplication
+      responses:
+        '201':
+          description: created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ApiKey'
 components:
   securitySchemes:
     #    bearerAuth:            # arbitrary name for the security scheme
@@ -132,3 +143,8 @@ components:
         imageUrl:
           type: string
           nullable: true
+    ApiKey:
+      type: object
+      properties:
+        value:
+          type: string
