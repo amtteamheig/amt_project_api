@@ -1,4 +1,4 @@
-package ch.heigvd.amt.configuration;
+package ch.heigvd.amt.security;
 
 public class WebSecurityConfig {
 }
