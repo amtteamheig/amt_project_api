@@ -31,10 +31,11 @@ public class ApiKeyFilter implements Filter {
             return;
         }
 
-        String key = request.getHeader("apiKeyAuth") == null ? "" : request.getHeader("X-API-KEY");
+        String key = request.getHeader("X-API-KEY") == null ? "" : request.getHeader("X-API-KEY");
         Optional<ApiKeyEntity> apiKeyEntityOptional = apiKeyRepository.findByValue(key);
 
         if(apiKeyEntityOptional.isPresent()) {
+            servletRequest.setAttribute("Application", apiKeyEntityOptional.get().getId());
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             HttpServletResponse response = (HttpServletResponse) servletResponse;
