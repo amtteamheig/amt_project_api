@@ -10,3 +10,20 @@ services:
       - '8080'
     ports :
       - '8080:8080'
+  
+  # Database
+  db:
+    image: library/mysql:8
+    restart: always
+    container_name: 'gamification_db_container'
+    environment:
+      MYSQL_DATABASE: 'gamificationdb'
+      # User so we don't have to use root
+      MYSQL_USER: 'dbGamificationDev'
+      MYSQL_PASSWORD: 'devpass'
+      MYSQL_ROOT_PASSWORD: 'devpa$$'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      - '3306'

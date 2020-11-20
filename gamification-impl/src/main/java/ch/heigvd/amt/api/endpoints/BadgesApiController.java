@@ -10,19 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 public class BadgesApiController implements BadgesApi {
 
     @Autowired
@@ -54,6 +51,11 @@ public class BadgesApiController implements BadgesApi {
         return ResponseEntity.ok(toBadge(existingBadgeEntity));
     }
 
+    /**
+     * Converts a badge to a badge entity
+     * @param badge : badge
+     * @return badge entity
+     */
     private BadgeEntity toBadgeEntity(Badge badge) {
         BadgeEntity entity = new BadgeEntity();
         entity.setKind(badge.getKind());
@@ -62,6 +64,11 @@ public class BadgesApiController implements BadgesApi {
         return entity;
     }
 
+    /**
+     * Converts a badge entity to a badge
+     * @param entity : badge entity
+     * @return badge
+     */
     private Badge toBadge(BadgeEntity entity) {
         Badge badge = new Badge();
         badge.setKind(entity.getKind());

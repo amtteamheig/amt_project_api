@@ -1,12 +1,16 @@
 package ch.heigvd.amt.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import javax.persistence.*;
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Data
-public class PointScaleEntity implements Serializable {
+public class PointScaleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
