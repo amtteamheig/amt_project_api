@@ -3,6 +3,7 @@ package ch.heigvd.amt.api.spec.steps;
 import ch.heigvd.amt.ApiException;
 import ch.heigvd.amt.ApiResponse;
 import ch.heigvd.amt.api.DefaultApi;
+import ch.heigvd.amt.api.dto.ApiKey;
 import ch.heigvd.amt.api.dto.Badge;
 import ch.heigvd.amt.api.dto.PointScale;
 import ch.heigvd.amt.api.spec.helpers.Environment;
@@ -31,6 +32,7 @@ public class BasicSteps {
     private boolean lastApiCallThrewException;
     private int lastStatusCode;
 
+    private ApiKey apiKey;
     private String lastReceivedLocationHeader;
 
     private Badge lastReceivedBadge;
@@ -44,6 +46,13 @@ public class BasicSteps {
     @Given("there is a Gamification server")
     public void there_is_a_Gamification_server() throws Throwable {
         assertNotNull(api);
+    }
+
+    @Given("there is a X-API-Key valid")
+    public void thereIsAXAPIKeyValid() throws ApiException {
+         apiKey = api.registerApplication();
+         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue());
+        System.out.println(apiKey.getValue());
     }
 
     @Given("I have a badge payload")
@@ -142,5 +151,4 @@ public class BasicSteps {
         lastApiException = apiException;
         lastStatusCode = lastApiException.getCode();
     }
-
 }
