@@ -1,7 +1,9 @@
 package ch.heigvd.amt.entities;
 
+import ch.heigvd.amt.api.model.ApiKey;
 import lombok.Data;
 import org.openapitools.jackson.nullable.JsonNullable;
+import org.springframework.data.annotation.Reference;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,5 +23,8 @@ public class BadgeEntity implements Serializable {
     @Column(columnDefinition = "DATE")
     private LocalDate obtainedDate;
 
+    @ManyToOne
+    @JoinColumn(name = "fk_apikey", referencedColumnName = "id")
+    private ApiKeyEntity apiKeyEntity;
 
 }

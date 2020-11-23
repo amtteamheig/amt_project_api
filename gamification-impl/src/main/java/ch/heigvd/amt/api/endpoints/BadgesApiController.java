@@ -3,6 +3,7 @@ package ch.heigvd.amt.api.endpoints;
 import ch.heigvd.amt.api.BadgesApi;
 import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.api.model.Badge;
+import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.BadgeRepository;
 import io.swagger.annotations.ApiParam;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +31,16 @@ public class BadgesApiController implements BadgesApi {
     @Autowired
     BadgeRepository badgeRepository;
 
+    @Autowired
+    ServletRequest servletRequest;
+
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createBadge(@ApiParam(value = "", required = true) @Valid @RequestBody Badge badge) {
+
+        HttpServletRequest req = (HttpServletRequest) servletRequest;
+
+        String key = req.getAttribute("application").toString();
+
         BadgeEntity newBadgeEntity = toBadgeEntity(badge);
         badgeRepository.save(newBadgeEntity);
 
@@ -49,8 +60,9 @@ public class BadgesApiController implements BadgesApi {
     }
 
     @Override
-    public ResponseEntity<Badge> getBadge(@ApiParam(value = "",required=true) @PathVariable("id") Integer id) {
-        BadgeEntity existingBadgeEntity = badgeRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Badge> getBadge(@ApiParam(value = "", required = true) @PathVariable("id") Integer id) {
+        BadgeEntity existingBadgeEntity = badgeRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(toBadge(existingBadgeEntity));
     }
 
