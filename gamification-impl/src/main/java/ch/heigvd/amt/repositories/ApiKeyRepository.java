@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ApiKeyRepository extends CrudRepository<ApiKeyEntity,  Long> {
     Optional<ApiKeyEntity> findByValue(String value);
+
+
 }

@@ -24,7 +24,7 @@ public class BadgeEntity implements Serializable {
     private LocalDate obtainedDate;
 
     @ManyToOne
-    @JoinColumn(name = "fk_apikey", referencedColumnName = "id")
+    @JoinColumn(name = "fk_apikey", referencedColumnName = "apikey_id")
     private ApiKeyEntity apiKeyEntity;
 
 }

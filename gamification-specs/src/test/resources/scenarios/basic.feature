@@ -2,6 +2,7 @@ Feature: Basic operations on badges
 
   Background:
     Given there is a Gamification server
+    Given there is a X-API-Key valid
 
   #
   # BADGES BASIC FEATURES
