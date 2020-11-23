@@ -19,9 +19,13 @@ paths:
       responses:
         '201':
           description: created
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
     get:
       description: get the list of badges
       operationId: getBadges
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: success
@@ -31,6 +35,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Badge'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /badges/{id}:
     get:
       description: get one badge, by id
@@ -110,6 +116,13 @@ components:
       type: apiKey
       in: header
       name: X-API-KEY
+  responses:
+    UnauthorizedError:
+      description: API key is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
   schemas:
     PointScale:
       type: object
