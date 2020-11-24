@@ -19,6 +19,8 @@ paths:
       responses:
         '201':
           description: created
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
     get:
       description: get the list of badges
       operationId: getBadges
@@ -31,6 +33,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Badge'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /badges/{id}:
     get:
       description: get one badge, by id
@@ -48,6 +52,8 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Badge'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /pointScales:
     post:
       description: create a pointScale
@@ -60,6 +66,8 @@ paths:
       responses:
         '201':
           description: created
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
     get:
       description: get the list of pointScales
       operationId: getPointScales
@@ -72,6 +80,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PointScale'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /pointScales/{id}:
     get:
       description: get one pointScale, by id
@@ -89,6 +99,8 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/PointScale'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /registration:
     post:
       description: registrate application
@@ -100,6 +112,8 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ApiKey'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 components:
   securitySchemes:
     #    bearerAuth:            # arbitrary name for the security scheme
@@ -110,6 +124,13 @@ components:
       type: apiKey
       in: header
       name: X-API-KEY
+  responses:
+    UnauthorizedError:
+      description: API key is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
   schemas:
     PointScale:
       type: object
