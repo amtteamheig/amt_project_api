@@ -49,9 +49,9 @@ public class BasicSteps {
     }
 
     @Given("there is a X-API-Key valid")
-    public void thereIsAXAPIKeyValid() throws ApiException {
-         apiKey = api.registerApplication();
-         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue());
+    public void     thereIsAXAPIKeyValid() throws ApiException {
+        apiKey = api.registerApplication();
+        api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue());
         System.out.println(apiKey.getValue());
     }
 
@@ -94,7 +94,8 @@ public class BasicSteps {
 
     @When("I send a GET to the URL in the location header")
     public void iSendAGETToTheURLInTheLocationHeader() {
-        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
@@ -141,7 +142,7 @@ public class BasicSteps {
         lastApiCallThrewException = false;
         lastApiException = null;
         lastStatusCode = lastApiResponse.getStatusCode();
-        List<String> locationHeaderValues = (List<String>)lastApiResponse.getHeaders().get("Location");
+        List<String> locationHeaderValues = (List<String>) lastApiResponse.getHeaders().get("Location");
         lastReceivedLocationHeader = locationHeaderValues != null ? locationHeaderValues.get(0) : null;
     }
 
@@ -150,5 +151,11 @@ public class BasicSteps {
         lastApiResponse = null;
         lastApiException = apiException;
         lastStatusCode = lastApiException.getCode();
+    }
+
+    @And("I receive a list containing {int} badge\\(s)")
+    public void iReceiveAListContainingBadgeS(int size) {
+        List<Badge> badges = (List<Badge>) lastApiResponse.getData();
+        assertEquals(badges.size(), size);
     }
 }

@@ -1,12 +1,12 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.BadgesApi;
+import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.api.model.Badge;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.BadgeRepository;
 import io.swagger.annotations.ApiParam;
-import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
@@ -33,13 +31,22 @@ public class BadgesApiController implements BadgesApi {
     BadgeRepository badgeRepository;
 
     @Autowired
+    ApiKeyRepository apiKeyRepository;
+
+    @Autowired
     ServletRequest servletRequest;
 
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createBadge(@ApiParam(value = "", required = true) @Valid @RequestBody Badge badge) {
 
+        long id = (long) servletRequest.getAttribute("Application");
+
+
+        ApiKeyEntity apiKey = apiKeyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         BadgeEntity newBadgeEntity = toBadgeEntity(badge);
+        newBadgeEntity.setApiKeyEntity(apiKey);
         badgeRepository.save(newBadgeEntity);
 
         URI location = ServletUriComponentsBuilder
@@ -50,31 +57,27 @@ public class BadgesApiController implements BadgesApi {
     }
 
     public ResponseEntity<List<Badge>> getBadges() {
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
-        String key = req.getAttribute("Application").toString();
+        long id = (long) servletRequest.getAttribute("Application");
 
-        Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(key);
+
+        Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityId(id);
+
         List<Badge> badges = new ArrayList<>();
 
-        if (badgeEntities.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        for (BadgeEntity badgeEntity : badgeRepository.findByApiKeyEntityValue(key).get()) {
-            badges.add(toBadge(badgeEntity));
-
+        if (badgeEntities.isPresent()) {
+            for (BadgeEntity badgeEntity : badgeEntities.get()) {
+                badges.add(toBadge(badgeEntity));
+            }
         }
 
         return ResponseEntity.ok(badges);
-
     }
 
     @Override
     public ResponseEntity<Badge> getBadge(@ApiParam(value = "", required = true) @PathVariable("id") Integer id) {
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
-        String key = req.getAttribute("Application").toString();
+        long apiKeyId = (long) servletRequest.getAttribute("Application");
 
-        BadgeEntity existingBadgeEntity = badgeRepository.findByApiKeyEntityValue_AndId(key, Long.valueOf(id))
+        BadgeEntity existingBadgeEntity = badgeRepository.findByApiKeyEntityId_AndId(apiKeyId, Long.valueOf(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(toBadge(existingBadgeEntity));
     }
