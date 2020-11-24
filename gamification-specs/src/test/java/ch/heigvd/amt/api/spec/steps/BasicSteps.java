@@ -52,7 +52,6 @@ public class BasicSteps {
     public void thereIsAXAPIKeyValid() throws ApiException {
          apiKey = api.registerApplication();
          api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue());
-        System.out.println(apiKey.getValue());
     }
 
     @Given("I have a badge payload")
