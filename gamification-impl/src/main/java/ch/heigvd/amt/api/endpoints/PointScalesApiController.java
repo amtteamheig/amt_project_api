@@ -46,6 +46,8 @@ public class PointScalesApiController implements PointScalesApi {
         return ResponseEntity.ok(pointScales);
     }
 
+
+
     @Override
     public ResponseEntity<PointScale> getPointScale(@ApiParam(value = "",required=true) @PathVariable("id") Integer id) {
         PointScaleEntity existingPointScaleEntity = pointScaleRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
