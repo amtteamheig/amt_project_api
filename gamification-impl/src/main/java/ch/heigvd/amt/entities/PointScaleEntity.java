@@ -15,5 +15,7 @@ public class PointScaleEntity implements Serializable {
     private String kind;
     private Integer points;
 
-
+    @ManyToOne
+    @JoinColumn(name = "fk_apikey", referencedColumnName = "id")
+    private ApiKeyEntity apiKeyEntity;
 }

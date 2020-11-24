@@ -41,7 +41,6 @@ public class BadgesApiController implements BadgesApi {
 
         long id = (long) servletRequest.getAttribute("Application");
 
-
         ApiKeyEntity apiKey = apiKeyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -58,7 +57,6 @@ public class BadgesApiController implements BadgesApi {
 
     public ResponseEntity<List<Badge>> getBadges() {
         long id = (long) servletRequest.getAttribute("Application");
-
 
         Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityId(id);
 

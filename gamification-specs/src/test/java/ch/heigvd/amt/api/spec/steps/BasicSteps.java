@@ -49,7 +49,7 @@ public class BasicSteps {
     }
 
     @Given("there is a X-API-Key valid")
-    public void     thereIsAXAPIKeyValid() throws ApiException {
+    public void thereIsAXAPIKeyValid() throws ApiException {
         apiKey = api.registerApplication();
         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue());
         System.out.println(apiKey.getValue());
@@ -157,5 +157,12 @@ public class BasicSteps {
     public void iReceiveAListContainingBadgeS(int size) {
         List<Badge> badges = (List<Badge>) lastApiResponse.getData();
         assertEquals(badges.size(), size);
+    }
+
+    @And("I receive a list containing {int} pointScale\\(s)")
+    public void iReceiveAListContainingPointScaleS(int size) {
+
+        List<PointScale> pointScales = (List<PointScale>) lastApiResponse.getData();
+        assertEquals(pointScales.size(), size);
     }
 }

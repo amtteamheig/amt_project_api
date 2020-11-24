@@ -1,8 +1,11 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.PointScalesApi;
+import ch.heigvd.amt.entities.ApiKeyEntity;
+import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.entities.PointScaleEntity;
 import ch.heigvd.amt.api.model.PointScale;
+import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.PointScaleRepository;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +18,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.ServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class PointScalesApiController implements PointScalesApi {
@@ -26,9 +31,22 @@ public class PointScalesApiController implements PointScalesApi {
     @Autowired
     PointScaleRepository pointScaleRepository;
 
+    @Autowired
+    ApiKeyRepository apiKeyRepository;
+
+    @Autowired
+    ServletRequest servletRequest;
+
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createPointScale(@ApiParam(value = "", required = true) @Valid @RequestBody PointScale pointScale) {
+    public ResponseEntity<Void> createPointScale(
+            @ApiParam(value = "", required = true) @Valid @RequestBody PointScale pointScale) {
+        long id = (long) servletRequest.getAttribute("Application");
+
+        ApiKeyEntity apiKey = apiKeyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
+        newPointScaleEntity.setApiKeyEntity(apiKey);
         pointScaleRepository.save(newPointScaleEntity);
 
         URI location = ServletUriComponentsBuilder
@@ -39,18 +57,31 @@ public class PointScalesApiController implements PointScalesApi {
     }
 
     public ResponseEntity<List<PointScale>> getPointScales() {
+
+        long id = (long) servletRequest.getAttribute("Application");
+
+        Optional<List<PointScaleEntity>> pointScalesEntries = pointScaleRepository.findByApiKeyEntityId(id);
+
         List<PointScale> pointScales = new ArrayList<>();
-        for (PointScaleEntity pointScaleEntity : pointScaleRepository.findAll()) {
-            pointScales.add(toPointScale(pointScaleEntity));
+
+        if (pointScalesEntries.isPresent()) {
+            for (PointScaleEntity pointScaleEntity : pointScalesEntries.get()) {
+                pointScales.add(toPointScale(pointScaleEntity));
+            }
         }
         return ResponseEntity.ok(pointScales);
     }
 
 
-
     @Override
-    public ResponseEntity<PointScale> getPointScale(@ApiParam(value = "",required=true) @PathVariable("id") Integer id) {
-        PointScaleEntity existingPointScaleEntity = pointScaleRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ResponseEntity<PointScale> getPointScale(
+            @ApiParam(value = "", required = true) @PathVariable("id") Integer id) {
+
+        long apiKeyId = (long) servletRequest.getAttribute("Application");
+
+        PointScaleEntity existingPointScaleEntity = pointScaleRepository.findByApiKeyEntityId_AndId(apiKeyId, Long.valueOf(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         return ResponseEntity.ok(toPointScale(existingPointScaleEntity));
     }
 
