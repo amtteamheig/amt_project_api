@@ -123,7 +123,7 @@ paths:
               $ref: '#/components/schemas/Event'
       responses:
         '200':
-          description: processed
+          description: success
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /rules:
@@ -171,6 +171,40 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Rule'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /users:
+    get:
+      description: get the list of users
+      operationId: getUsers
+      responses:
+        '200':
+          description: success
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /users/{id}:
+    get:
+      description: get one user, by id
+      operationId: getUser
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: success
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -243,6 +277,19 @@ components:
                   format: uri
                 amount:
                   type: integer
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        badges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Badge'
+        pointScales:
+          type: array
+          items:
+            $ref: '#/components/schemas/PointScale'
     ApiKey:
       type: object
       properties:

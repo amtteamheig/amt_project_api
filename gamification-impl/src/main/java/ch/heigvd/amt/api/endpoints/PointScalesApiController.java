@@ -27,6 +27,7 @@ public class PointScalesApiController implements PointScalesApi {
     PointScaleRepository pointScaleRepository;
 
     @Override
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createPointScale(@Valid PointScale pointScale) {
         PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
         pointScaleRepository.save(newPointScaleEntity);

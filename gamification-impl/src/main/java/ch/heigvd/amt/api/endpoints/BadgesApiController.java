@@ -24,6 +24,7 @@ public class BadgesApiController implements BadgesApi {
     BadgeRepository badgeRepository;
 
     @Override
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createBadge(@Valid Badge badge) {
         BadgeEntity newBadgeEntity = toBadgeEntity(badge);
         badgeRepository.save(newBadgeEntity);
