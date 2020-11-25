@@ -18,7 +18,7 @@ public class ApiKeyController implements RegistrationApi {
     @Autowired
     ApiKeyRepository apiKeyRepository;
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public ResponseEntity<ApiKey> registerApplication() {
 
         ApiKey apiKey = new ApiKey();
