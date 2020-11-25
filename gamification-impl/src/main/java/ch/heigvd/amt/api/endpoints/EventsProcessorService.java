@@ -25,6 +25,8 @@ public class EventsProcessorService implements EventsApi {
 
         UserEntity user = UsersController.toUserEntity(event.getUserId());
 
+        //TODO handle rules
+
         userRepository.save(user);
 
         return ResponseEntity.ok().build();
