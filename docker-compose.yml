@@ -8,7 +8,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c './wait-for db:3306 -- npm start'
     expose:
       - '8080'
     ports :
