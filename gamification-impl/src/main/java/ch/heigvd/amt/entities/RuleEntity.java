@@ -19,5 +19,5 @@ public class RuleEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-
+    //TODO
 }

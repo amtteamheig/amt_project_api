@@ -19,5 +19,7 @@ public class PointScaleEntity {
     private String name;
     private String description;
 
-
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=false)
+    private UserEntity user;
 }
