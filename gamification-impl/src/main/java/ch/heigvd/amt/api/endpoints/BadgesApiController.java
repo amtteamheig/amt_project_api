@@ -56,7 +56,7 @@ public class BadgesApiController implements BadgesApi {
      */
     private BadgeEntity toBadgeEntity(Badge badge) {
         BadgeEntity entity = new BadgeEntity();
-        entity.setKind(badge.getKind());
+        entity.setName(badge.getName());
         entity.setObtainedDate(badge.getObtainedDate());
         entity.setImageUrl(badge.getImageUrl());
         return entity;
@@ -69,7 +69,7 @@ public class BadgesApiController implements BadgesApi {
      */
     private Badge toBadge(BadgeEntity entity) {
         Badge badge = new Badge();
-        badge.setKind(entity.getKind());
+        badge.setName(entity.getName());
         badge.setObtainedDate(entity.getObtainedDate());
         badge.setImageUrl(entity.getImageUrl());
         return badge;

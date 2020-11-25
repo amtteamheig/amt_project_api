@@ -57,7 +57,7 @@ public class BasicSteps {
     @Given("I have a badge payload")
     public void i_have_a_badge_payload() throws Throwable {
         badge = new ch.heigvd.amt.api.dto.Badge()
-                .kind("Diamond")
+                .name("Diamond")
                 .obtainedDate(LocalDate.now())
                 .imageUrl("https://...");
     }
@@ -111,8 +111,8 @@ public class BasicSteps {
     @Given("I have a pointScale payload")
     public void i_have_a_pointScale_payload() throws Throwable {
         pointScale = new ch.heigvd.amt.api.dto.PointScale()
-                .kind("Diamonds Category")
-                .points(10);
+                .name("Diamonds Category")
+                .description("it's a diamond");
     }
 
     @When("^I POST the pointScale payload to the /pointScales endpoint$")

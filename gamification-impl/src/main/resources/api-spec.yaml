@@ -112,8 +112,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ApiKey'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
 components:
   securitySchemes:
     #    bearerAuth:            # arbitrary name for the security scheme
@@ -135,14 +133,14 @@ components:
     PointScale:
       type: object
       properties:
-        kind:
+        name:
           type: string
-        points:
-          type: integer
+        description:
+          type: string
     Badge:
       type: object
       properties:
-        kind:
+        name:
           type: string
         obtainedDate:
           type: string

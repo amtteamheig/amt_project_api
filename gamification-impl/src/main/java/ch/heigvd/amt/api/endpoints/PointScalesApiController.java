@@ -56,15 +56,15 @@ public class PointScalesApiController implements PointScalesApi {
 
     private PointScaleEntity toPointScaleEntity(PointScale pointScale) {
         PointScaleEntity entity = new PointScaleEntity();
-        entity.setKind(pointScale.getKind());
-        entity.setPoints(pointScale.getPoints());
+        entity.setName(pointScale.getName());
+        entity.setDescription(pointScale.getDescription());
         return entity;
     }
 
     private PointScale toPointScale(PointScaleEntity entity) {
         PointScale pointScale = new PointScale();
-        pointScale.setKind(entity.getKind());
-        pointScale.setPoints(entity.getPoints());
+        pointScale.setName(entity.getName());
+        pointScale.setDescription(entity.getDescription());
         return pointScale;
     }
 

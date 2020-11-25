@@ -16,8 +16,8 @@ public class PointScaleEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String kind;
-    private Integer points;
+    private String name;
+    private String description;
 
 
 }
