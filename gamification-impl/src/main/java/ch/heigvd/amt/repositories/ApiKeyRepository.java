@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ApiKeyRepository extends JpaRepository<ApiKeyEntity,  Long> {
-    Optional<ApiKeyEntity> findByValue(UUID value);
+@Repository
+public interface ApiKeyRepository extends JpaRepository<ApiKeyEntity,  UUID> {
+
 }
