@@ -35,6 +35,7 @@ public class BadgesApiController implements BadgesApi {
         return ResponseEntity.created(location).build();
     }
 
+    @Override
     public ResponseEntity<List<Badge>> getBadges() {
         List<Badge> badges = new ArrayList<>();
         for (BadgeEntity badgeEntity : badgeRepository.findAll()) {

@@ -38,6 +38,7 @@ public class PointScalesApiController implements PointScalesApi {
         return ResponseEntity.created(location).build();
     }
 
+    @Override
     public ResponseEntity<List<PointScale>> getPointScales() {
         List<PointScale> pointScales = new ArrayList<>();
         for (PointScaleEntity pointScaleEntity : pointScaleRepository.findAll()) {
