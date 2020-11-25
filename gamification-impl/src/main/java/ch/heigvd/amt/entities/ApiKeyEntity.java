@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Data
-public class ApiKeyEntity implements Serializable {
+public class ApiKeyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
