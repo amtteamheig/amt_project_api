@@ -16,9 +16,10 @@ public class UserEntity {
     @Id
     private String id;
 
+    /*
     @OneToMany(mappedBy = "user")
     private Set<BadgeEntity> badges;
 
     @OneToMany(mappedBy = "user")
-    private Set<PointScaleEntity> pointScales;
+    private Set<PointScaleEntity> pointScales;*/
 }

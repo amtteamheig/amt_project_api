@@ -1,4 +1,3 @@
-
 openapi: '3.0.3'
 info:
   version: '0.1.0'
@@ -117,13 +116,14 @@ paths:
     post:
       description: process an event
       operationId: eventProcess
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Event'
       responses:
         '200':
           description: processed
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/Event'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /rules:

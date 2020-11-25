@@ -27,7 +27,8 @@ public class BadgeEntity {
     @Column(columnDefinition = "DATE")
     private LocalDate obtainedDate;
 
+    /*
     @ManyToOne
     @JoinColumn(name="user_id", nullable=false)
-    private UserEntity user;
+    private UserEntity user;*/
 }
