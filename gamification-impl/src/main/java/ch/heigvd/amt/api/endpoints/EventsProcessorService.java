@@ -23,22 +23,11 @@ public class EventsProcessorService implements EventsApi {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> eventProcess(@Valid Event event) {
 
-        UserEntity user = toUserEntity(event.getUserId());
+        UserEntity user = UsersController.toUserEntity(event.getUserId());
 
         userRepository.save(user);
 
         return ResponseEntity.ok().build();
-    }
-
-    /**
-     * get a new user entity
-     * @param id string id
-     * @return user entity
-     */
-    private UserEntity toUserEntity(String id) {
-        UserEntity entity = new UserEntity();
-        entity.setId(id);
-        return entity;
     }
 
 }

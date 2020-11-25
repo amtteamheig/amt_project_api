@@ -47,7 +47,8 @@ public class BadgesApiController implements BadgesApi {
 
     @Override
     public ResponseEntity<Badge> getBadge(Integer id) {
-        BadgeEntity existingBadgeEntity = badgeRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        BadgeEntity existingBadgeEntity = badgeRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(toBadge(existingBadgeEntity));
     }
 
