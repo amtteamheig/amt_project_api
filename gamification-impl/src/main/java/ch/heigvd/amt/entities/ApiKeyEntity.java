@@ -15,9 +15,6 @@ import java.util.UUID;
 public class ApiKeyEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     private UUID value;
 
 }

@@ -37,7 +37,7 @@ public class ApiKeyFilter implements Filter {
         Optional<ApiKeyEntity> apiKeyEntityOptional = apiKeyRepository.findByValue(UUID.fromString(key));
 
         if(apiKeyEntityOptional.isPresent()) {
-            servletRequest.setAttribute("Application", apiKeyEntityOptional.get().getId());
+            servletRequest.setAttribute("Application", apiKeyEntityOptional.get().getValue());
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             HttpServletResponse response = (HttpServletResponse) servletResponse;
