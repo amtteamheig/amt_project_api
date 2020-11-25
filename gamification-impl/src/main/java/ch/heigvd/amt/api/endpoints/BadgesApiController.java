@@ -24,7 +24,7 @@ public class BadgesApiController implements BadgesApi {
     BadgeRepository badgeRepository;
 
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createBadge(@ApiParam(value = "", required = true) @Valid @RequestBody Badge badge) {
+    public ResponseEntity<Void> createBadge(@Valid Badge badge) {
         BadgeEntity newBadgeEntity = toBadgeEntity(badge);
         badgeRepository.save(newBadgeEntity);
 
@@ -45,7 +45,7 @@ public class BadgesApiController implements BadgesApi {
     }
 
     @Override
-    public ResponseEntity<Badge> getBadge(@ApiParam(value = "",required=true) @PathVariable("id") Integer id) {
+    public ResponseEntity<Badge> getBadge(Integer id) {
         BadgeEntity existingBadgeEntity = badgeRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(toBadge(existingBadgeEntity));
     }

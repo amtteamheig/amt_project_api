@@ -27,7 +27,7 @@ public class PointScalesApiController implements PointScalesApi {
     PointScaleRepository pointScaleRepository;
 
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createPointScale(@ApiParam(value = "", required = true) @Valid @RequestBody PointScale pointScale) {
+    public ResponseEntity<Void> createPointScale(@Valid PointScale pointScale) {
         PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
         pointScaleRepository.save(newPointScaleEntity);
 
@@ -50,7 +50,7 @@ public class PointScalesApiController implements PointScalesApi {
 
 
     @Override
-    public ResponseEntity<PointScale> getPointScale(@ApiParam(value = "",required=true) @PathVariable("id") Integer id) {
+    public ResponseEntity<PointScale> getPointScale(Integer id) {
         PointScaleEntity existingPointScaleEntity = pointScaleRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(toPointScale(existingPointScaleEntity));
     }
