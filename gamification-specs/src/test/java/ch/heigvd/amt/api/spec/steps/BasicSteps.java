@@ -50,8 +50,9 @@ public class BasicSteps {
 
     @Given("there is a X-API-Key valid")
     public void thereIsAXAPIKeyValid() throws ApiException {
-         apiKey = api.registerApplication();
-         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue());
+        apiKey = api.registerApplication();
+        assert apiKey.getValue() != null;
+        api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
     }
 
     @Given("I have a badge payload")

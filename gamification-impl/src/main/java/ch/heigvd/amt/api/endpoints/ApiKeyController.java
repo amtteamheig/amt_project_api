@@ -22,7 +22,7 @@ public class ApiKeyController implements RegistrationApi {
     public ResponseEntity<ApiKey> registerApplication() {
 
         ApiKey apiKey = new ApiKey();
-        apiKey.setValue(UUID.randomUUID().toString());
+        apiKey.setValue(UUID.randomUUID());
 
         ApiKeyEntity newApiKeyEntity = toApiKeyEntity(apiKey);
         apiKeyRepository.save(newApiKeyEntity);

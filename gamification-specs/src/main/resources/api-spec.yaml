@@ -1,3 +1,4 @@
+
 openapi: '3.0.3'
 info:
   version: '0.1.0'
@@ -112,6 +113,68 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ApiKey'
+  /events:
+    post:
+      description: process an event
+      operationId: eventProcess
+      responses:
+        '200':
+          description: processed
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Event'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /rules:
+    post:
+      description: create a rule
+      operationId: createRule
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '201':
+          description: created
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      description: get the list of rules
+      operationId: getRules
+      responses:
+        '200':
+          description: success
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /rules/{id}:
+    get:
+      description: get one rule, by id
+      operationId: getRule
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: success
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+
 components:
   securitySchemes:
     #    bearerAuth:            # arbitrary name for the security scheme
@@ -145,12 +208,44 @@ components:
         obtainedDate:
           type: string
           format: date
-          nullable: false
         imageUrl:
           type: string
           nullable: true
+    Event:
+      type: object
+      properties:
+        userId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        type:
+          type: string
+    Rule:
+      type: object
+      properties:
+        if:
+          type: object
+          properties:
+            type:
+              type: string
+        then:
+          type: object
+          properties:
+            awardBadge:
+              type: string
+              format: uri
+            awardPoints:
+              type: object
+              properties:
+                pointScale:
+                  type: string
+                  format: uri
+                amount:
+                  type: integer
     ApiKey:
       type: object
       properties:
         value:
           type: string
+          format: uuid
