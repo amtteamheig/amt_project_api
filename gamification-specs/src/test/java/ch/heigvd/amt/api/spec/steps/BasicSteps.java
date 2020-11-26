@@ -3,19 +3,20 @@ package ch.heigvd.amt.api.spec.steps;
 import ch.heigvd.amt.ApiException;
 import ch.heigvd.amt.ApiResponse;
 import ch.heigvd.amt.api.DefaultApi;
-import ch.heigvd.amt.api.dto.ApiKey;
-import ch.heigvd.amt.api.dto.Badge;
-import ch.heigvd.amt.api.dto.PointScale;
+import ch.heigvd.amt.api.dto.*;
+import ch.heigvd.amt.api.dto.Event;
 import ch.heigvd.amt.api.spec.helpers.Environment;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.Assert;
 
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,6 +28,8 @@ public class BasicSteps {
 
     Badge badge;
     PointScale pointScale;
+    User user;
+    Event event;
 
     private ApiResponse lastApiResponse;
     private ApiException lastApiException;
@@ -38,6 +41,7 @@ public class BasicSteps {
 
     private Badge lastReceivedBadge;
     private PointScale lastReceivedPointScale;
+    private User lastReceivedUser;
 
     public BasicSteps(Environment environment) {
         this.environment = environment;
@@ -61,7 +65,7 @@ public class BasicSteps {
         badge = new ch.heigvd.amt.api.dto.Badge()
                 .name("Diamond")
                 .obtainedDate(LocalDate.now())
-                .imageUrl("https://...");
+                .imageUrl("https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo-diamond-classic-cut.jpg");
     }
 
     @When("^I POST the badge payload to the /badges endpoint$")
@@ -148,6 +152,60 @@ public class BasicSteps {
     @And("I receive a payload that is the same as the pointScale payload")
     public void iReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
         assertEquals(pointScale, lastReceivedPointScale);
+    }
+
+    @Given("there is a user with an ID")
+    public void thereIsAnUserWithAnId() throws Throwable {
+        user = new ch.heigvd.amt.api.dto.User()
+                .id(UUID.randomUUID().toString());
+    }
+
+    @Given("I have an event payload")
+    public void iHaveAnEventPayload() throws Throwable {
+        event = new ch.heigvd.amt.api.dto.Event()
+                .timestamp(OffsetDateTime.now())
+                .type("Rule type")
+                .userId(user.getId());
+    }
+
+    @When("^I POST the event payload to the /events endpoint$")
+    public void i_POST_the_event_payload_to_the_events_endpoint() throws Throwable {
+        try {
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("I send a GET to the user URL in the location header")
+    public void iSendAGETToTheUserURLInTheLocationHeader() {
+        try {
+            lastApiResponse = api.getUserWithHttpInfo(user.getId());
+            processApiResponse(lastApiResponse);
+            lastReceivedUser = (User) lastApiResponse.getData();
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @And("I receive a payload with points and badges")
+    public void iReceiveAPayloadWithPointsAndBadges() {
+        assert user.getId() != null;
+        String lastReceivedUserString = lastReceivedUser.toString();
+        Assert.assertTrue(lastReceivedUserString.contains(user.getId()));
+        Assert.assertTrue(lastReceivedUserString.contains("points"));
+        Assert.assertTrue(lastReceivedUserString.contains("badges"));
+    }
+
+    @When("^I send a GET to the /users endpoint$")
+    public void iSendAGETToTheUsersEndpoint() {
+        try {
+            lastApiResponse = api.getUsersWithHttpInfo();
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
     }
 
     private void processApiResponse(ApiResponse apiResponse) {
