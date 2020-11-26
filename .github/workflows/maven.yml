@@ -23,8 +23,9 @@ jobs:
         run: ./run-app.sh
       - name: Run Specs test
         run: |
+          sh ./git-wait-server.sh
           cd gamification-specs
-          mvn test
+          mvn clean test
       - name: Archive jar
         uses: actions/upload-artifact@v2
         with:
