@@ -12,6 +12,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -88,12 +89,8 @@ public class BasicSteps {
         }
     }
 
-    @Then("I receive a {int} status code with a location header")
-    public void iReceiveAStatusCodeWithALocationHeader(int arg0) {
-    }
-
-    @When("I send a GET to the URL in the location header")
-    public void iSendAGETToTheURLInTheLocationHeader() {
+    @When("I send a GET to the badge URL in the location header")
+    public void iSendAGETToTheBadgeURLInTheLocationHeader() {
         Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
             lastApiResponse = api.getBadgeWithHttpInfo(id);
@@ -134,6 +131,23 @@ public class BasicSteps {
         } catch (ApiException e) {
             processApiException(e);
         }
+    }
+
+    @When("I send a GET to the pointScale URL in the location header")
+    public void iSendAGETToThePointScaleURLInTheLocationHeader() {
+        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        try {
+            lastApiResponse = api.getPointScaleWithHttpInfo(id);
+            processApiResponse(lastApiResponse);
+            lastReceivedPointScale = (PointScale) lastApiResponse.getData();
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @And("I receive a payload that is the same as the pointScale payload")
+    public void iReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
+        assertEquals(pointScale, lastReceivedPointScale);
     }
 
     private void processApiResponse(ApiResponse apiResponse) {
