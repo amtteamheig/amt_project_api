@@ -286,10 +286,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Badge'
-        pointScales:
+        points:
           type: array
           items:
-            $ref: '#/components/schemas/PointScale'
+            type: object
+            properties:
+              pointScale:
+                $ref: '#/components/schemas/PointScale'
+              amount:
+                type: integer
     ApiKey:
       type: object
       properties:
