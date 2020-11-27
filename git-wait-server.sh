@@ -1,9 +1,3 @@
 #!/bin/bash
 echo "Waiting spring to launch on 8080..."
-
-while ! timeout 1m bash -c "echo > /dev/tcp/localhost/8080"; do   
-  sleep 1
-  echo "..."
-done
-
-echo "Spring launched"
+timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
