@@ -72,6 +72,16 @@ public class BasicSteps {
         }
     }
 
+    @When("^I POST the pointScale payload to the /pointScales endpoint$")
+    public void i_POST_the_pointScale_payload_to_the_pointScales_endpoint() throws Throwable {
+        try {
+            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
     @When("I POST the {string} badge payload to the /badges endpoint")
     public void i_POST_the_badge_payload_to_the_badges_endpoint(String kind) throws Throwable {
         try {
@@ -102,8 +112,8 @@ public class BasicSteps {
     public void iReceiveAStatusCodeWithALocationHeader(int arg0) {
     }
 
-    @When("I send a GET to the URL in the location header")
-    public void iSendAGETToTheURLInTheLocationHeader() {
+    @When("I send a GET to the URL in the location header for badges")
+    public void iSendAGETToTheURLInTheLocationHeaderBadges() {
         Integer id = Integer
                 .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
@@ -115,21 +125,39 @@ public class BasicSteps {
         }
     }
 
+    @When("I send a GET to the URL in the location header for pointScales")
+    public void iSendAGETToTheURLInTheLocationHeaderPointScales() {
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        try {
+            lastApiResponse = api.getPointScaleWithHttpInfo(id);
+            processApiResponse(lastApiResponse);
+            lastReceivedPointScale = (PointScale) lastApiResponse.getData();
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
     @And("I receive a payload that is the same as the badge payload")
     public void iReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
         assertEquals(badge, lastReceivedBadge);
     }
 
-    @Given("I have a pointScale payload")
-    public void i_have_a_pointScale_payload() throws Throwable {
-        pointScale = new ch.heigvd.amt.api.dto.PointScale()
-                .kind("Diamonds Category")
-                .points(10);
+    @And("I receive a payload that is the same as the pointScale payload")
+    public void iReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
+        assertEquals(pointScale, lastReceivedPointScale);
     }
 
-    @When("^I POST the pointScale payload to the /pointScales endpoint$")
-    public void i_POST_the_pointScale_payload_to_the_pointScales_endpoint() throws Throwable {
+    @Given("I have a pointScale payload")
+    public void i_have_a_pointScale_payload() throws Throwable {
+        pointScale = new ch.heigvd.amt.api.dto.PointScale();
+    }
+
+    @When("I POST the {string} pointScale of value {int} payload to the /pointScales endpoint")
+    public void i_POST_the_pointScale_payload_to_the_pointScales_endpoint(String kind, int value) throws Throwable {
         try {
+            pointScale.setKind(kind);
+            pointScale.setPoints(value);
             lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
