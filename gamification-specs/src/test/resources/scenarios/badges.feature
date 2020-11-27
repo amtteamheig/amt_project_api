@@ -6,7 +6,7 @@ Feature: Validation of badges implementation
 
   #
   # Create a badge (POST / GET with entire payload check)
-  #
+  # 
   Scenario: a created badge can be retrieved with the proper data
     Given I have a badge payload
     When I POST the "Diamond" badge payload to the /badges endpoint
