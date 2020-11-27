@@ -1,4 +1,8 @@
 #!/bin/bash
-while ! curl --output /dev/null --silent --head --fail http://localhost:8080; 
-do sleep 1 && echo -n .;
-done;
+echo "Waiting spring to launch on 8080..."
+
+while ! timeout 1 bash -c "echo > /dev/tcp/localhost/8080"; do   
+  sleep 1
+done
+
+echo "Spring launched"
