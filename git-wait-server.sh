@@ -1,2 +1,4 @@
-#!/bin/bash
-sleep 5
+#!/bin/sh
+
+
+sleep 1m
