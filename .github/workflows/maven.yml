@@ -41,7 +41,7 @@ jobs:
       - name: mvn clean package
         run: |
           cd gamification-specs
-          mvn clean pacjage
+          mvn clean package
       - name: Archive jar
         uses: actions/upload-artifact@v2
         with:
