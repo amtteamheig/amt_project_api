@@ -12,6 +12,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -57,7 +58,6 @@ public class BasicSteps {
     @Given("I have a badge payload")
     public void i_have_a_badge_payload() throws Throwable {
         badge = new ch.heigvd.amt.api.dto.Badge()
-                .kind("Diamond")
                 .obtainedDate(LocalDate.now())
                 .imageUrl("https://...");
     }
@@ -65,6 +65,17 @@ public class BasicSteps {
     @When("^I POST the badge payload to the /badges endpoint$")
     public void i_POST_the_badge_payload_to_the_badges_endpoint() throws Throwable {
         try {
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("I POST the {string} badge payload to the /badges endpoint")
+    public void i_POST_the_badge_payload_to_the_badges_endpoint(String kind) throws Throwable {
+        try {
+            badge.setKind(kind);
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
@@ -152,16 +163,14 @@ public class BasicSteps {
         lastStatusCode = lastApiException.getCode();
     }
 
-    @And("I receive a list containing {int} badge\\(s)")
-    public void iReceiveAListContainingBadgeS(int size) {
-        List<Badge> badges = (List<Badge>) lastApiResponse.getData();
-        assertEquals(badges.size(), size);
-    }
-
     @And("I receive a list containing {int} pointScale\\(s)")
     public void iReceiveAListContainingPointScaleS(int size) {
-
         List<PointScale> pointScales = (List<PointScale>) lastApiResponse.getData();
         assertEquals(pointScales.size(), size);
+    }
+
+    @And("I receive a badge that was created today")
+    public void iReceiveABadgeThatWasCreatedToday() {
+        assertEquals(badge.getObtainedDate(), LocalDate.now());
     }
 }
