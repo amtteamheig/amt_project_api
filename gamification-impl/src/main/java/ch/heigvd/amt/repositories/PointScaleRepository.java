@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface PointScaleRepository extends JpaRepository<PointScaleEntity, Long> {
 
-    Optional<List<PointScaleEntity>> findByApiKeyEntityValue(UUID apiKeyId);
-    Optional<PointScaleEntity> findByApiKeyEntityValue_AndId(UUID apiKeyId, Long pointScaleId);
+    Optional<List<PointScaleEntity>> findByApiKeyEntityValue(String apiKeyId);
+    Optional<PointScaleEntity> findByApiKeyEntityValue_AndId(String apiKeyId, Long pointScaleId);
 
 }

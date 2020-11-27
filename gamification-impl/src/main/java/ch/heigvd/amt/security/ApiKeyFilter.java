@@ -34,7 +34,7 @@ public class ApiKeyFilter implements Filter {
 
         String key = request.getHeader("X-API-KEY") == null ?
                  new UUID( 0 , 0 ).toString() : request.getHeader("X-API-KEY");
-        Optional<ApiKeyEntity> apiKeyEntityOptional = apiKeyRepository.findById(UUID.fromString(key));
+        Optional<ApiKeyEntity> apiKeyEntityOptional = apiKeyRepository.findById(key);
 
         if(apiKeyEntityOptional.isPresent()) {
             servletRequest.setAttribute("Application", apiKeyEntityOptional.get().getValue());

@@ -20,7 +20,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 public class PointScalesApiController implements PointScalesApi {
@@ -36,7 +35,7 @@ public class PointScalesApiController implements PointScalesApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createPointScale(@Valid PointScale pointScale) {
-        UUID apiKeyId = (UUID) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -55,7 +54,7 @@ public class PointScalesApiController implements PointScalesApi {
     @Override
     public ResponseEntity<List<PointScale>> getPointScales() {
 
-        UUID apiKeyId = (UUID) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
         Optional<List<PointScaleEntity>> pointScalesEntries =
                 pointScaleRepository.findByApiKeyEntityValue(apiKeyId);
@@ -74,7 +73,7 @@ public class PointScalesApiController implements PointScalesApi {
     @Override
     public ResponseEntity<PointScale> getPointScale(Integer id) {
 
-        UUID apiKeyId = (UUID) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
         PointScaleEntity existingPointScaleEntity =
                 pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))

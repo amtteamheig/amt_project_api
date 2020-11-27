@@ -36,7 +36,7 @@ public class BadgesApiController implements BadgesApi {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createBadge(@Valid Badge badge) {
 
-        UUID apiKeyId = (UUID) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -54,7 +54,7 @@ public class BadgesApiController implements BadgesApi {
 
     @Override
     public ResponseEntity<List<Badge>> getBadges() {
-        UUID apiKeyId = (UUID) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
         Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(apiKeyId);
 
@@ -71,7 +71,7 @@ public class BadgesApiController implements BadgesApi {
 
     @Override
     public ResponseEntity<Badge> getBadge(Integer id) {
-        UUID apiKeyId = (UUID) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
         BadgeEntity existingBadgeEntity =
                 badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))

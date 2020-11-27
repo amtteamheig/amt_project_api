@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,6 +13,6 @@ import java.util.UUID;
 public class ApiKeyEntity {
 
     @Id
-    private UUID value;
+    private String value;
 
 }

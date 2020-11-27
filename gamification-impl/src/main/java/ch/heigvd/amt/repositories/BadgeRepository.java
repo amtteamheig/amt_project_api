@@ -11,6 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface BadgeRepository extends JpaRepository<BadgeEntity, Long> {
-    Optional<List<BadgeEntity>> findByApiKeyEntityValue(UUID apiKeyId);
-    Optional<BadgeEntity> findByApiKeyEntityValue_AndId(UUID apiKeyId, Long badgeId);
+    Optional<List<BadgeEntity>> findByApiKeyEntityValue(String apiKeyId);
+    Optional<BadgeEntity> findByApiKeyEntityValue_AndId(String apiKeyId, Long badgeId);
 }

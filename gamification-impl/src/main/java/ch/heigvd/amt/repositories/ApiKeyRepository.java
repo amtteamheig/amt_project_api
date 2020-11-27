@@ -8,6 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ApiKeyRepository extends JpaRepository<ApiKeyEntity,  UUID> {
+public interface ApiKeyRepository extends JpaRepository<ApiKeyEntity,  String> {
 
 }
