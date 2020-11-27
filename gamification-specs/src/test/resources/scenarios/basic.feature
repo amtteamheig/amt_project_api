@@ -1,4 +1,4 @@
-Feature: Basic operations on badges
+Feature: Basic operations on badges and pointScales
 
   Background:
     Given there is a Gamification server

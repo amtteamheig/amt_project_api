@@ -7,10 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.List;
+import java.util.UUID;
+
 @Repository
 public interface PointScaleRepository extends JpaRepository<PointScaleEntity, Long> {
 
-    Optional<List<PointScaleEntity>> findByApiKeyEntityId(long id);
+    Optional<List<PointScaleEntity>> findByApiKeyEntityValue(UUID apiKeyId);
+    Optional<PointScaleEntity> findByApiKeyEntityValue_AndId(UUID apiKeyId, Long pointScaleId);
 
-    Optional<PointScaleEntity> findByApiKeyEntityId_AndId(long apiKeyId, Long valueOf);
 }

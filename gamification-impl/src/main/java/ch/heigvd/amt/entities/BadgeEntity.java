@@ -30,7 +30,7 @@ public class BadgeEntity {
     private LocalDate obtainedDate;
 
     @ManyToOne
-    @JoinColumn(name = "fk_apikey", referencedColumnName = "id")
+    @JoinColumn(name = "fk_apikey", referencedColumnName = "value")
     private ApiKeyEntity apiKeyEntity;
 
 }
