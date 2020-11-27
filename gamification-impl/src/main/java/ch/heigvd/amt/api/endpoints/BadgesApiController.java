@@ -6,7 +6,6 @@ import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.api.model.Badge;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.BadgeRepository;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class BadgesApiController implements BadgesApi {
@@ -34,11 +34,11 @@ public class BadgesApiController implements BadgesApi {
     ServletRequest servletRequest;
 
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createBadge(@ApiParam(value = "", required = true) @Valid @RequestBody Badge badge) {
+    public ResponseEntity<Void> createBadge(@Valid Badge badge) {
 
-        long id = (long) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        ApiKeyEntity apiKey = apiKeyRepository.findById(id)
+        ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         BadgeEntity newBadgeEntity = toBadgeEntity(badge);
@@ -52,10 +52,11 @@ public class BadgesApiController implements BadgesApi {
         return ResponseEntity.created(location).build();
     }
 
+    @Override
     public ResponseEntity<List<Badge>> getBadges() {
-        long id = (long) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityId(id);
+        Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(apiKeyId);
 
         List<Badge> badges = new ArrayList<>();
 
@@ -69,11 +70,13 @@ public class BadgesApiController implements BadgesApi {
     }
 
     @Override
-    public ResponseEntity<Badge> getBadge(@ApiParam(value = "", required = true) @PathVariable("id") Integer id) {
-        long apiKeyId = (long) servletRequest.getAttribute("Application");
+    public ResponseEntity<Badge> getBadge(Integer id) {
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        BadgeEntity existingBadgeEntity = badgeRepository.findByApiKeyEntityId_AndId(apiKeyId, Long.valueOf(id))
+        BadgeEntity existingBadgeEntity =
+                badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         return ResponseEntity.ok(toBadge(existingBadgeEntity));
     }
 
@@ -84,7 +87,7 @@ public class BadgesApiController implements BadgesApi {
      */
     private BadgeEntity toBadgeEntity(Badge badge) {
         BadgeEntity entity = new BadgeEntity();
-        entity.setKind(badge.getKind());
+        entity.setName(badge.getName());
         entity.setObtainedDate(badge.getObtainedDate());
         entity.setImageUrl(badge.getImageUrl());
         return entity;
@@ -97,7 +100,7 @@ public class BadgesApiController implements BadgesApi {
      */
     private Badge toBadge(BadgeEntity entity) {
         Badge badge = new Badge();
-        badge.setKind(entity.getKind());
+        badge.setName(entity.getName());
         badge.setObtainedDate(entity.getObtainedDate());
         badge.setImageUrl(entity.getImageUrl());
         return badge;

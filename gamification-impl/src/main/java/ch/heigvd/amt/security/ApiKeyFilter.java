@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @Order(1)
@@ -31,11 +32,12 @@ public class ApiKeyFilter implements Filter {
             return;
         }
 
-        String key = request.getHeader("X-API-KEY") == null ? "" : request.getHeader("X-API-KEY");
-        Optional<ApiKeyEntity> apiKeyEntityOptional = apiKeyRepository.findByValue(key);
+        String key = request.getHeader("X-API-KEY") == null ?
+                 new UUID( 0 , 0 ).toString() : request.getHeader("X-API-KEY");
+        Optional<ApiKeyEntity> apiKeyEntityOptional = apiKeyRepository.findById(key);
 
         if(apiKeyEntityOptional.isPresent()) {
-            servletRequest.setAttribute("Application", apiKeyEntityOptional.get().getId());
+            servletRequest.setAttribute("Application", apiKeyEntityOptional.get().getValue());
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             HttpServletResponse response = (HttpServletResponse) servletResponse;

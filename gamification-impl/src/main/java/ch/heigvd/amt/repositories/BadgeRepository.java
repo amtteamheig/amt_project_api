@@ -7,11 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 public interface BadgeRepository extends JpaRepository<BadgeEntity, Long> {
-    Optional<List<BadgeEntity>> findByApiKeyEntityId(long id);
-
-    Optional<BadgeEntity> findByApiKeyEntityId_AndId(long apiKeyId, long badgeId);
-
-
+    Optional<List<BadgeEntity>> findByApiKeyEntityValue(String apiKeyId);
+    Optional<BadgeEntity> findByApiKeyEntityValue_AndId(String apiKeyId, Long badgeId);
 }

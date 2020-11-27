@@ -2,17 +2,13 @@ package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.PointScalesApi;
 import ch.heigvd.amt.entities.ApiKeyEntity;
-import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.entities.PointScaleEntity;
 import ch.heigvd.amt.api.model.PointScale;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.PointScaleRepository;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,11 +34,10 @@ public class PointScalesApiController implements PointScalesApi {
     ServletRequest servletRequest;
 
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createPointScale(
-            @ApiParam(value = "", required = true) @Valid @RequestBody PointScale pointScale) {
-        long id = (long) servletRequest.getAttribute("Application");
+    public ResponseEntity<Void> createPointScale(@Valid PointScale pointScale) {
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        ApiKeyEntity apiKey = apiKeyRepository.findById(id)
+        ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
@@ -56,11 +51,13 @@ public class PointScalesApiController implements PointScalesApi {
         return ResponseEntity.created(location).build();
     }
 
+    @Override
     public ResponseEntity<List<PointScale>> getPointScales() {
 
-        long id = (long) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        Optional<List<PointScaleEntity>> pointScalesEntries = pointScaleRepository.findByApiKeyEntityId(id);
+        Optional<List<PointScaleEntity>> pointScalesEntries =
+                pointScaleRepository.findByApiKeyEntityValue(apiKeyId);
 
         List<PointScale> pointScales = new ArrayList<>();
 
@@ -74,12 +71,12 @@ public class PointScalesApiController implements PointScalesApi {
 
 
     @Override
-    public ResponseEntity<PointScale> getPointScale(
-            @ApiParam(value = "", required = true) @PathVariable("id") Integer id) {
+    public ResponseEntity<PointScale> getPointScale(Integer id) {
 
-        long apiKeyId = (long) servletRequest.getAttribute("Application");
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        PointScaleEntity existingPointScaleEntity = pointScaleRepository.findByApiKeyEntityId_AndId(apiKeyId, Long.valueOf(id))
+        PointScaleEntity existingPointScaleEntity =
+                pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return ResponseEntity.ok(toPointScale(existingPointScaleEntity));
@@ -87,15 +84,15 @@ public class PointScalesApiController implements PointScalesApi {
 
     private PointScaleEntity toPointScaleEntity(PointScale pointScale) {
         PointScaleEntity entity = new PointScaleEntity();
-        entity.setKind(pointScale.getKind());
-        entity.setPoints(pointScale.getPoints());
+        entity.setName(pointScale.getName());
+        entity.setDescription(pointScale.getDescription());
         return entity;
     }
 
     private PointScale toPointScale(PointScaleEntity entity) {
         PointScale pointScale = new PointScale();
-        pointScale.setKind(entity.getKind());
-        pointScale.setPoints(entity.getPoints());
+        pointScale.setName(entity.getName());
+        pointScale.setDescription(entity.getDescription());
         return pointScale;
     }
 
