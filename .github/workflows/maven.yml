@@ -23,8 +23,9 @@ jobs:
         run: ./run-app.sh
       - name: Run Specs test
         run: |
+          ./git-wait-server.sh http://localhost:8080 -- echo "Spring API hot and ready."
           cd gamification-specs
-          mvn test
+          mvn clean test
       - name: Archive jar
         uses: actions/upload-artifact@v2
         with:
