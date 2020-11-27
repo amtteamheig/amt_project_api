@@ -1,10 +1,12 @@
 package ch.heigvd.amt.entities;
 
+import ch.heigvd.amt.api.model.ApiKey;
 import com.sun.istack.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openapitools.jackson.nullable.JsonNullable;
+import org.springframework.data.annotation.Reference;
 import springfox.documentation.spring.web.json.Json;
 
 import javax.persistence.*;
@@ -26,5 +28,9 @@ public class BadgeEntity {
 
     @Column(columnDefinition = "DATE")
     private LocalDate obtainedDate;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_apikey", referencedColumnName = "id")
+    private ApiKeyEntity apiKeyEntity;
 
 }

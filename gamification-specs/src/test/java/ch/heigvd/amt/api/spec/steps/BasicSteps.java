@@ -93,7 +93,8 @@ public class BasicSteps {
 
     @When("I send a GET to the URL in the location header")
     public void iSendAGETToTheURLInTheLocationHeader() {
-        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
@@ -128,7 +129,7 @@ public class BasicSteps {
     @When("^I send a GET to the /pointScales endpoint$")
     public void iSendAGETToThePointScalesEndpoint() {
         try {
-            lastApiResponse = api.getBadgesWithHttpInfo();
+            lastApiResponse = api.getPointScalesWithHttpInfo();
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -140,7 +141,7 @@ public class BasicSteps {
         lastApiCallThrewException = false;
         lastApiException = null;
         lastStatusCode = lastApiResponse.getStatusCode();
-        List<String> locationHeaderValues = (List<String>)lastApiResponse.getHeaders().get("Location");
+        List<String> locationHeaderValues = (List<String>) lastApiResponse.getHeaders().get("Location");
         lastReceivedLocationHeader = locationHeaderValues != null ? locationHeaderValues.get(0) : null;
     }
 
@@ -149,5 +150,18 @@ public class BasicSteps {
         lastApiResponse = null;
         lastApiException = apiException;
         lastStatusCode = lastApiException.getCode();
+    }
+
+    @And("I receive a list containing {int} badge\\(s)")
+    public void iReceiveAListContainingBadgeS(int size) {
+        List<Badge> badges = (List<Badge>) lastApiResponse.getData();
+        assertEquals(badges.size(), size);
+    }
+
+    @And("I receive a list containing {int} pointScale\\(s)")
+    public void iReceiveAListContainingPointScaleS(int size) {
+
+        List<PointScale> pointScales = (List<PointScale>) lastApiResponse.getData();
+        assertEquals(pointScales.size(), size);
     }
 }

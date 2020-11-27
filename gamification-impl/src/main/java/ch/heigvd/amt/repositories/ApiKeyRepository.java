@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface ApiKeyRepository extends JpaRepository<ApiKeyEntity,  Long> {
     Optional<ApiKeyEntity> findByValue(String value);
+
+
 }
