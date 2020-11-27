@@ -20,6 +20,6 @@ public class PointScaleEntity {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "fk_apikey", referencedColumnName = "value")
+    @JoinColumn(name = "fk_apikey")
     private ApiKeyEntity apiKeyEntity;
 }
