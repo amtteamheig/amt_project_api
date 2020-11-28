@@ -12,8 +12,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 
-import java.time.DayOfWeek;
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
