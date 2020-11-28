@@ -152,7 +152,8 @@ public class BasicSteps {
     @Given("I have a pointScale payload")
     public void iHaveAPointScalePayload() throws Throwable {
         pointScale = new ch.heigvd.amt.api.dto.PointScale()
-                .name("Diamonds Category");
+                .name("Diamonds Category")
+                .description("it's a diamond");;
     }
 
     @When("I POST the {string} pointScale payload to the /pointScales endpoint")
