@@ -45,7 +45,7 @@ public class BasicSteps {
     }
 
     @Given("there is a Gamification server")
-    public void there_is_a_Gamification_server() throws Throwable {
+    public void thereIsAGamificationServer() throws Throwable {
         assertNotNull(api);
     }
 
@@ -56,14 +56,14 @@ public class BasicSteps {
     }
 
     @Given("I have a badge payload")
-    public void i_have_a_badge_payload() throws Throwable {
+    public void iHaveABadgePayload() throws Throwable {
         badge = new ch.heigvd.amt.api.dto.Badge()
                 .obtainedDate(LocalDate.now())
                 .imageUrl("https://...");
     }
 
     @When("^I POST the badge payload to the /badges endpoint$")
-    public void i_POST_the_badge_payload_to_the_badges_endpoint() throws Throwable {
+    public void iPOSTTheBadgePayloadToTheBadgesEndpoint() throws Throwable {
         try {
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
@@ -73,7 +73,7 @@ public class BasicSteps {
     }
 
     @When("^I POST the pointScale payload to the /pointScales endpoint$")
-    public void i_POST_the_pointScale_payload_to_the_pointScales_endpoint() throws Throwable {
+    public void iPOSTThePointScalePayloadToThePointScalesEndpoint() throws Throwable {
         try {
             lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
             processApiResponse(lastApiResponse);
@@ -83,7 +83,7 @@ public class BasicSteps {
     }
 
     @When("I POST the {string} badge payload to the /badges endpoint")
-    public void i_POST_the_badge_payload_to_the_badges_endpoint(String kind) throws Throwable {
+    public void iPOSTTheBadgePayloadToTheBadgesEndpoint(String kind) throws Throwable {
         try {
             badge.setKind(kind);
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
@@ -94,7 +94,7 @@ public class BasicSteps {
     }
 
     @Then("I receive a {int} status code")
-    public void i_receive_a_status_code(int expectedStatusCode) throws Throwable {
+    public void iReceiveAStatusCode(int expectedStatusCode) throws Throwable {
         assertEquals(expectedStatusCode, lastStatusCode);
     }
 
@@ -149,12 +149,12 @@ public class BasicSteps {
     }
 
     @Given("I have a pointScale payload")
-    public void i_have_a_pointScale_payload() throws Throwable {
+    public void iHaveAPointScalePayload() throws Throwable {
         pointScale = new ch.heigvd.amt.api.dto.PointScale();
     }
 
     @When("I POST the {string} pointScale of value {int} payload to the /pointScales endpoint")
-    public void i_POST_the_pointScale_payload_to_the_pointScales_endpoint(String kind, int value) throws Throwable {
+    public void iPOSTThePointScalePayloadToThePointScalesEndpoint(String kind, int value) throws Throwable {
         try {
             pointScale.setKind(kind);
             pointScale.setPoints(value);
