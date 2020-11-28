@@ -22,7 +22,7 @@ public class BadgeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String kind;
+    private String name;
 
     private JsonNullable<String> imageUrl;
 
@@ -30,7 +30,7 @@ public class BadgeEntity {
     private LocalDate obtainedDate;
 
     @ManyToOne
-    @JoinColumn(name = "fk_apikey", referencedColumnName = "id")
+    @JoinColumn(name = "fk_apikey")
     private ApiKeyEntity apiKeyEntity;
 
 }

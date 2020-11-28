@@ -12,7 +12,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: test cucumber
+    name: test cucumber local
+    if: github.ref != 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -26,6 +27,21 @@ jobs:
           ./git-wait-server.sh http://localhost:8080 -- echo "Spring API hot and ready."
           cd gamification-specs
           mvn clean test
+
+  build :
+    runs-on: ubuntu-latest
+    name: build application .jar
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: mvn clean package
+        run: |
+          cd gamification-specs
+          mvn clean package
       - name: Archive jar
         uses: actions/upload-artifact@v2
         with:
@@ -35,7 +51,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy docker image
-    needs : test
+    needs : build
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - name: Download jar from previous job
@@ -49,5 +66,3 @@ jobs:
           docker build -t amt-project/gamification .
           docker tag amt-project/gamification ghcr.io/amtteamheig/gamification
           docker push ghcr.io/amtteamheig/gamification
-
-

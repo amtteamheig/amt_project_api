@@ -18,11 +18,11 @@ public class ApiKeyController implements RegistrationApi {
     @Autowired
     ApiKeyRepository apiKeyRepository;
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public ResponseEntity<ApiKey> registerApplication() {
 
         ApiKey apiKey = new ApiKey();
-        apiKey.setValue(UUID.randomUUID().toString());
+        apiKey.setValue(UUID.randomUUID());
 
         ApiKeyEntity newApiKeyEntity = toApiKeyEntity(apiKey);
         apiKeyRepository.save(newApiKeyEntity);
@@ -32,7 +32,7 @@ public class ApiKeyController implements RegistrationApi {
 
     private ApiKeyEntity toApiKeyEntity(ApiKey apiKey) {
         ApiKeyEntity entity = new ApiKeyEntity();
-        entity.setValue(apiKey.getValue());
+        entity.setValue(apiKey.getValue().toString());
         return entity;
     }
 
