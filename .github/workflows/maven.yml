@@ -40,7 +40,7 @@ jobs:
           java-version: 11
       - name: mvn clean package
         run: |
-          cd gamification-specs
+          cd gamification-impl
           mvn clean package
       - name: Archive jar
         uses: actions/upload-artifact@v2
