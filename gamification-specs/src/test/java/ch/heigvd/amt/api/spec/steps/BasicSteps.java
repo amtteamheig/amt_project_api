@@ -47,6 +47,10 @@ public class BasicSteps {
         this.api = environment.getApi();
     }
 
+    /*
+        ====  GENERAL  ====
+     */
+
     @Given("there is a Gamification server")
     public void thereIsAGamificationServer() throws Throwable {
         assertNotNull(api);
@@ -59,6 +63,16 @@ public class BasicSteps {
         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
     }
 
+    @Given("there is a user with an ID")
+    public void thereIsAnUserWithAnId() throws Throwable {
+        user = new ch.heigvd.amt.api.dto.User()
+                .id(UUID.randomUUID().toString());
+    }
+
+    /*
+        ====  PAYLOADS  ====
+    */
+
     @Given("I have a badge payload")
     public void iHaveABadgePayload() throws Throwable {
         badge = new ch.heigvd.amt.api.dto.Badge()
@@ -66,6 +80,25 @@ public class BasicSteps {
                 .obtainedDate(LocalDate.now())
                 .imageUrl("https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo-diamond-classic-cut.jpg");
     }
+
+    @Given("I have a pointScale payload")
+    public void iHaveAPointScalePayload() throws Throwable {
+        pointScale = new ch.heigvd.amt.api.dto.PointScale()
+                .name("Diamonds Category")
+                .description("it's a diamond");;
+    }
+
+    @Given("I have an event payload")
+    public void iHaveAnEventPayload() throws Throwable {
+        event = new ch.heigvd.amt.api.dto.Event()
+                .timestamp(OffsetDateTime.now())
+                .type("Rule type")
+                .userId(user.getId());
+    }
+
+    /*
+        ====  POSTS  ====
+    */
 
     @When("^I POST the badge payload to the /badges endpoint$")
     public void iPOSTTheBadgePayloadToTheBadgesEndpoint() throws Throwable {
@@ -98,10 +131,30 @@ public class BasicSteps {
         }
     }
 
-    @Then("I receive a {int} status code")
-    public void iReceiveAStatusCode(int expectedStatusCode) throws Throwable {
-        assertEquals(expectedStatusCode, lastStatusCode);
+    @When("I POST the {string} pointScale payload to the /pointScales endpoint")
+    public void iPOSTThePointScalePayloadToThePointScalesEndpoint(String name) throws Throwable {
+        try {
+            pointScale.setName(name);
+            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
     }
+
+    @When("^I POST the event payload to the /events endpoint$")
+    public void iPOSTTheEventPayloadToTheEventsEndpoint() throws Throwable {
+        try {
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    /*
+        ====  GETS  ====
+    */
 
     @When("^I send a GET to the /badges endpoint$")
     public void iSendAGETToTheBadgesEndpoint() {
@@ -113,7 +166,7 @@ public class BasicSteps {
         }
     }
 
-    @When("I send a GET to the URL in the location header for badges")
+    @When("I send a GET to the badge URL in the location header")
     public void iSendAGETToTheURLInTheLocationHeaderBadges() {
         Integer id = Integer
                 .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
@@ -121,47 +174,6 @@ public class BasicSteps {
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
             lastReceivedBadge = (Badge) lastApiResponse.getData();
-        } catch (ApiException e) {
-            processApiException(e);
-        }
-    }
-
-    @When("I send a GET to the URL in the location header for pointScales")
-    public void iSendAGETToTheURLInTheLocationHeaderPointScales() {
-        Integer id = Integer
-                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
-        try {
-            lastApiResponse = api.getPointScaleWithHttpInfo(id);
-            processApiResponse(lastApiResponse);
-            lastReceivedPointScale = (PointScale) lastApiResponse.getData();
-        } catch (ApiException e) {
-            processApiException(e);
-        }
-    }
-
-    @And("I receive a payload that is the same as the badge payload")
-    public void iReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
-        assertEquals(badge, lastReceivedBadge);
-    }
-
-    @And("I receive a payload that is the same as the pointScale payload")
-    public void iReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
-        assertEquals(pointScale, lastReceivedPointScale);
-    }
-
-    @Given("I have a pointScale payload")
-    public void iHaveAPointScalePayload() throws Throwable {
-        pointScale = new ch.heigvd.amt.api.dto.PointScale()
-                .name("Diamonds Category")
-                .description("it's a diamond");;
-    }
-
-    @When("I POST the {string} pointScale payload to the /pointScales endpoint")
-    public void iPOSTThePointScalePayloadToThePointScalesEndpoint(String name) throws Throwable {
-        try {
-            pointScale.setName(name);
-            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
-            processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
         }
@@ -189,30 +201,6 @@ public class BasicSteps {
         }
     }
 
-    @Given("there is a user with an ID")
-    public void thereIsAnUserWithAnId() throws Throwable {
-        user = new ch.heigvd.amt.api.dto.User()
-                .id(UUID.randomUUID().toString());
-    }
-
-    @Given("I have an event payload")
-    public void iHaveAnEventPayload() throws Throwable {
-        event = new ch.heigvd.amt.api.dto.Event()
-                .timestamp(OffsetDateTime.now())
-                .type("Rule type")
-                .userId(user.getId());
-    }
-
-    @When("^I POST the event payload to the /events endpoint$")
-    public void iPOSTTheEventPayloadToTheEventsEndpoint() throws Throwable {
-        try {
-            lastApiResponse = api.eventProcessWithHttpInfo(event);
-            processApiResponse(lastApiResponse);
-        } catch (ApiException e) {
-            processApiException(e);
-        }
-    }
-
     @When("I send a GET to the user URL in the location header")
     public void iSendAGETToTheUserURLInTheLocationHeader() {
         try {
@@ -222,15 +210,6 @@ public class BasicSteps {
         } catch (ApiException e) {
             processApiException(e);
         }
-    }
-
-    @And("I receive a payload with points and badges")
-    public void iReceiveAPayloadWithPointsAndBadges() {
-        assert user.getId() != null;
-        String lastReceivedUserString = lastReceivedUser.toString();
-        Assert.assertTrue(lastReceivedUserString.contains(user.getId()));
-        Assert.assertTrue(lastReceivedUserString.contains("points"));
-        Assert.assertTrue(lastReceivedUserString.contains("badges"));
     }
 
     @When("^I send a GET to the /users endpoint$")
@@ -243,20 +222,32 @@ public class BasicSteps {
         }
     }
 
-    private void processApiResponse(ApiResponse apiResponse) {
-        lastApiResponse = apiResponse;
-        lastApiCallThrewException = false;
-        lastApiException = null;
-        lastStatusCode = lastApiResponse.getStatusCode();
-        List<String> locationHeaderValues = (List<String>) lastApiResponse.getHeaders().get("Location");
-        lastReceivedLocationHeader = locationHeaderValues != null ? locationHeaderValues.get(0) : null;
+    /*
+        ====  RECEPTION  ====
+    */
+
+    @Then("I receive a {int} status code")
+    public void iReceiveAStatusCode(int expectedStatusCode) throws Throwable {
+        assertEquals(expectedStatusCode, lastStatusCode);
     }
 
-    private void processApiException(ApiException apiException) {
-        lastApiCallThrewException = true;
-        lastApiResponse = null;
-        lastApiException = apiException;
-        lastStatusCode = lastApiException.getCode();
+    @And("I receive a payload that is the same as the badge payload")
+    public void iReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
+        assertEquals(badge, lastReceivedBadge);
+    }
+
+    @And("I receive a payload that is the same as the pointScale payload")
+    public void iReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
+        assertEquals(pointScale, lastReceivedPointScale);
+    }
+
+    @And("I receive a payload with points and badges")
+    public void iReceiveAPayloadWithPointsAndBadges() {
+        assert user.getId() != null;
+        String lastReceivedUserString = lastReceivedUser.toString();
+        Assert.assertTrue(lastReceivedUserString.contains(user.getId()));
+        Assert.assertTrue(lastReceivedUserString.contains("points"));
+        Assert.assertTrue(lastReceivedUserString.contains("badges"));
     }
 
     @And("I receive a list containing {int} badge\\(s)")
@@ -274,5 +265,25 @@ public class BasicSteps {
     @And("I receive a badge that was created today")
     public void iReceiveABadgeThatWasCreatedToday() {
         assertEquals(badge.getObtainedDate(), LocalDate.now());
+    }
+    
+    /*
+        ====  UTILS  ====
+    */
+
+    private void processApiResponse(ApiResponse apiResponse) {
+        lastApiResponse = apiResponse;
+        lastApiCallThrewException = false;
+        lastApiException = null;
+        lastStatusCode = lastApiResponse.getStatusCode();
+        List<String> locationHeaderValues = (List<String>) lastApiResponse.getHeaders().get("Location");
+        lastReceivedLocationHeader = locationHeaderValues != null ? locationHeaderValues.get(0) : null;
+    }
+
+    private void processApiException(ApiException apiException) {
+        lastApiCallThrewException = true;
+        lastApiResponse = null;
+        lastApiException = apiException;
+        lastStatusCode = lastApiException.getCode();
     }
 }

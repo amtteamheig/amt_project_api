@@ -6,10 +6,11 @@ Feature: Check server is running
   #
   # Create a point scale (POST / GET with entire payload check)
   #
-  Scenario: a created badge can be retrieved with the proper data
+  Scenario: a created point scale can be retrieved with the proper data
     Given I have a pointScale payload
-    When I POST the "Diamond Rank" pointScale of value 100 payload to the /pointScales endpoint
+    When I POST the "Diamond Rank" pointScale payload to the /pointScales endpoint
     Then I receive a 201 status code
-    When I send a GET to the URL in the location header for pointScales
+    When I send a GET to the /pointScales endpoint
     Then I receive a 200 status code
+    And I receive a list containing 1 pointScale(s)
     And I receive a payload that is the same as the pointScale payload
