@@ -168,8 +168,7 @@ public class BasicSteps {
 
     @When("I send a GET to the badge URL in the location header")
     public void iSendAGETToTheURLInTheLocationHeaderBadges() {
-        Integer id = Integer
-                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
@@ -266,7 +265,7 @@ public class BasicSteps {
     public void iReceiveABadgeThatWasCreatedToday() {
         assertEquals(badge.getObtainedDate(), LocalDate.now());
     }
-    
+
     /*
         ====  UTILS  ====
     */
