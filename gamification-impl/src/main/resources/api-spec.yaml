@@ -5,7 +5,7 @@ info:
   description: API of our gamification
 security:
   #  - bearerAuth: []
-  - apiKeyAuth: []
+  - apiKeyAuth: [ ]
 paths:
   /badges:
     post:
@@ -45,6 +45,7 @@ paths:
           schema:
             type: integer
           required: true
+          description: The id of a specific badge
       responses:
         '200':
           description: success
@@ -54,6 +55,29 @@ paths:
                 $ref: '#/components/schemas/Badge'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+    patch:
+      description: Update a specific badge
+      operationId: patchBadges
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The id of a specific badge
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              items:
+                $ref: '#/components/schemas/Badge'
+      responses:
+        '200':
+          description: success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Not found
   /pointScales:
     post:
       description: create a pointScale
@@ -101,6 +125,29 @@ paths:
                 $ref: '#/components/schemas/PointScale'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+    patch:
+      description: Update a specific pointScale
+      operationId: patchPointScale
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The id of a specific pointScale
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              items:
+                $ref: '#/components/schemas/PointScale'
+      responses:
+        '200':
+          description: success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Not found
   /registration:
     post:
       description: registrate application
