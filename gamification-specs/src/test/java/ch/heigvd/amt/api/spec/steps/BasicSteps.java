@@ -116,17 +116,6 @@ public class BasicSteps {
         ====  POSTS  ====
     */
 
-    @When("^I POST the pointScale payload to the /pointScales endpoint")
-    public void iPOSTThePointScalePayloadToThePointScalesEndpoint() throws Throwable {
-        try {
-            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
-            processApiResponse(lastApiResponse);
-        } catch (ApiException e) {
-            processApiException(e);
-        }
-    }
-
-
     @When("The application {string} POST the {string} badge payload to the \\/badges endpoint")
     public void theApplicationPOSTTheBadgePayloadToTheBadgesEndpoint(String applicationReference, String name)
             throws Throwable {
@@ -296,20 +285,28 @@ public class BasicSteps {
         Assert.assertTrue(lastReceivedUserString.contains("badges"));
     }
 
-    @And("The application {string} receive a list containing {int} badge\\(s)")
-    public void theApplicationReceiveAListContainingBadgeS(String applicationReference, int size) {
+    @And("The application {string} GET to the /badges endpoint receive a list containing {int} badge\\(s)")
+    public void theApplicationReceiveAListContainingBadges(String applicationReference, int size) {
 
-        checkCurrentApplication(applicationReference);
-        List<Badge> badges = (List<Badge>) lastApiResponse.getData();
-        assertEquals(badges.size(), size);
+        try {
+            checkCurrentApplication(applicationReference);
+            List<Badge> badges = api.getBadges();
+            assertEquals(size, badges.size());
+        } catch (ApiException e) {
+            processApiException(e);
+        }
     }
 
-    @And("The application {string} receive a list containing {int} pointScale\\(s)")
-    public void theApplicationReceiveAListContainingPointScaleS(String applicationReference, int size) {
+    @And("The application {string} GET to the /pointScales endpoint receive a list containing {int} pointScale\\(s)")
+    public void theApplicationReceiveAListContainingPointScales(String applicationReference, int size) {
 
-        checkCurrentApplication(applicationReference);
-        List<PointScale> pointScales = (List<PointScale>) lastApiResponse.getData();
-        assertEquals(pointScales.size(), size);
+        try {
+            checkCurrentApplication(applicationReference);
+            List<PointScale> pointScales = api.getPointScales();
+            assertEquals(pointScales.size(), size);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
     }
 
     @And("The application receive a badge that was created today")
