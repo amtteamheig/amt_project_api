@@ -11,7 +11,7 @@ import java.util.TimeZone;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "ch.heigvd.amt", "ch.heigvd.amt.api" })
-public class    Swagger2SpringBoot implements CommandLineRunner {
+public class Swagger2SpringBoot implements CommandLineRunner {
 
     @PostConstruct
     void started() {
