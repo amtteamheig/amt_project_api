@@ -78,14 +78,17 @@ public class BasicSteps {
         badge = new ch.heigvd.amt.api.dto.Badge()
                 .name("Diamond")
                 .obtainedDate(LocalDate.now())
-                .imageUrl("https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo-diamond-classic-cut.jpg");
+                .imageUrl(
+                        "https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo" +
+                                "-diamond-classic-cut.jpg");
     }
 
     @Given("I have a pointScale payload")
     public void iHaveAPointScalePayload() throws Throwable {
         pointScale = new ch.heigvd.amt.api.dto.PointScale()
                 .name("Diamonds Category")
-                .description("it's a diamond");;
+                .description("it's a diamond");
+        ;
     }
 
     @Given("I have an event payload")
@@ -168,7 +171,8 @@ public class BasicSteps {
 
     @When("I send a GET to the badge URL in the location header")
     public void iSendAGETToTheURLInTheLocationHeaderBadges() {
-        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
@@ -190,7 +194,8 @@ public class BasicSteps {
 
     @When("I send a GET to the pointScale URL in the location header")
     public void iSendAGETToThePointScaleURLInTheLocationHeader() {
-        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
             lastApiResponse = api.getPointScaleWithHttpInfo(id);
             processApiResponse(lastApiResponse);
@@ -218,6 +223,24 @@ public class BasicSteps {
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
+        }
+    }
+
+    /*
+        ====  PATCH  ====
+    */
+
+
+    @When("I PATCH the last  send badge and change the name with {string}")
+    public void iPATCHTheLastRequestAndChangeTheNameWith(String newName) {
+        try {
+            lastApiResponse = api.getBadgesWithHttpInfo();
+            badge = (Badge) lastApiResponse.getData();
+
+          //  lastApiResponse = api.patchBadgesWithHttpInfo();
+
+        } catch (ApiException e) {
+            e.printStackTrace();
         }
     }
 

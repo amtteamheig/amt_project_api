@@ -6,6 +6,11 @@ import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.api.model.Badge;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.BadgeRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +24,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 public class BadgesApiController implements BadgesApi {
@@ -75,13 +79,35 @@ public class BadgesApiController implements BadgesApi {
 
         BadgeEntity existingBadgeEntity =
                 badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return ResponseEntity.ok(toBadge(existingBadgeEntity));
     }
 
+    @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
+    public ResponseEntity<Badge> updateBadge(@PathVariable("id") final Integer id,
+                                             @RequestBody final JsonPatch patch) {
+
+        try {
+            String apiKeyId = (String) servletRequest.getAttribute("Application");
+
+            BadgeEntity existingBadgeEntity =
+                    badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+            BadgeEntity patchedBadgeEntity = applyPatchToBadge(patch, existingBadgeEntity);
+            badgeRepository.save(patchedBadgeEntity);
+            return ResponseEntity.ok(toBadge(patchedBadgeEntity));
+        } catch (JsonPatchException | JsonProcessingException e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
     /**
      * Converts a badge to a badge entity
+     *
      * @param badge : badge
      * @return badge entity
      */
@@ -95,6 +121,7 @@ public class BadgesApiController implements BadgesApi {
 
     /**
      * Converts a badge entity to a badge
+     *
      * @param entity : badge entity
      * @return badge
      */
@@ -106,4 +133,12 @@ public class BadgesApiController implements BadgesApi {
         return badge;
     }
 
+    private BadgeEntity applyPatchToBadge(JsonPatch patch, BadgeEntity targetBadge) throws JsonPatchException,
+            JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        JsonNode patched = patch.apply(objectMapper.convertValue(targetBadge, JsonNode.class));
+
+        return objectMapper.treeToValue(patched, BadgeEntity.class);
+    }
 }

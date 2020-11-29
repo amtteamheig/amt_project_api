@@ -36,3 +36,12 @@ Feature: Validation of badges implementation
     When I send a GET to the badge URL in the location header
     Then I receive a 200 status code
     And I receive a badge that was created today
+
+  Scenario: update badge
+    Given I have a badge payload
+    When I POST the "Diamond" badge payload to the /badges endpoint
+    Then I receive a 201 status code
+      @badge =
+    When I PATCH the last send badge and change the name with "Golden"
+    Then I receive a 200 status code
+
