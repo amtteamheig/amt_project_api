@@ -14,7 +14,9 @@ import org.junit.Assert;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -42,6 +44,12 @@ public class BasicSteps {
     private PointScale lastReceivedPointScale;
     private User lastReceivedUser;
 
+    // Keep track of the application created during the scenarios execution
+    private final Map<String, ApiKey> applications = new HashMap<>();
+
+    // Keep track of the application user created during the scenarios execution
+    private final Map<String, Map<String, User>> applicationUsers = new HashMap<>();
+
     public BasicSteps(Environment environment) {
         this.environment = environment;
         this.api = environment.getApi();
@@ -56,36 +64,44 @@ public class BasicSteps {
         assertNotNull(api);
     }
 
-    @Given("there is a X-API-Key valid")
-    public void thereIsAXAPIKeyValid() throws ApiException {
+    @Given("there is a X-API-Key valid for application {string}")
+    public void thereIsAXAPIKeyValidForApplication(String applicationReference) throws ApiException {
         apiKey = api.registerApplication();
         assert apiKey.getValue() != null;
         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
+        applications.put(applicationReference, apiKey);
+        applicationUsers.put(applicationReference, new HashMap<>());
     }
 
-    @Given("there is a user with an ID")
-    public void thereIsAnUserWithAnId() throws Throwable {
+    @Given("there is a user {string} with an ID for the application {string}")
+    public void thereIsAnUserWithAnIdForTheApplication(String userReference, String applicationReference)
+            throws Throwable {
         user = new ch.heigvd.amt.api.dto.User()
                 .id(UUID.randomUUID().toString());
+
+        applicationUsers.get(applicationReference).put(userReference, user);
     }
 
     /*
         ====  PAYLOADS  ====
     */
 
-    @Given("I have a badge payload")
+    @Given("The application has a badge payload")
     public void iHaveABadgePayload() throws Throwable {
         badge = new ch.heigvd.amt.api.dto.Badge()
                 .name("Diamond")
                 .obtainedDate(LocalDate.now())
-                .imageUrl("https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo-diamond-classic-cut.jpg");
+                .imageUrl(
+                        "https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo" +
+                                "-diamond-classic-cut.jpg");
     }
 
-    @Given("I have a pointScale payload")
+    @Given("The application have a pointScale payload")
     public void iHaveAPointScalePayload() throws Throwable {
         pointScale = new ch.heigvd.amt.api.dto.PointScale()
                 .name("Diamonds Category")
-                .description("it's a diamond");;
+                .description("it's a diamond");
+        ;
     }
 
     @Given("I have an event payload")
@@ -100,17 +116,7 @@ public class BasicSteps {
         ====  POSTS  ====
     */
 
-    @When("^I POST the badge payload to the /badges endpoint$")
-    public void iPOSTTheBadgePayloadToTheBadgesEndpoint() throws Throwable {
-        try {
-            lastApiResponse = api.createBadgeWithHttpInfo(badge);
-            processApiResponse(lastApiResponse);
-        } catch (ApiException e) {
-            processApiException(e);
-        }
-    }
-
-    @When("^I POST the pointScale payload to the /pointScales endpoint$")
+    @When("^I POST the pointScale payload to the /pointScales endpoint")
     public void iPOSTThePointScalePayloadToThePointScalesEndpoint() throws Throwable {
         try {
             lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
@@ -120,9 +126,15 @@ public class BasicSteps {
         }
     }
 
-    @When("I POST the {string} badge payload to the /badges endpoint")
-    public void iPOSTTheBadgePayloadToTheBadgesEndpoint(String name) throws Throwable {
+
+    @When("The application {string} POST the {string} badge payload to the \\/badges endpoint")
+    public void theApplicationPOSTTheBadgePayloadToTheBadgesEndpoint(String applicationReference, String name)
+            throws Throwable {
         try {
+
+            // change api key if needed
+            checkCurrentApplication(applicationReference);
+
             badge.setName(name);
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
@@ -131,9 +143,11 @@ public class BasicSteps {
         }
     }
 
-    @When("I POST the {string} pointScale payload to the /pointScales endpoint")
-    public void iPOSTThePointScalePayloadToThePointScalesEndpoint(String name) throws Throwable {
+
+    @When("The application {string} POST the {string} pointScale payload to the \\/pointScales endpoint")
+    public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference, String name) {
         try {
+            checkCurrentApplication(applicationReference);
             pointScale.setName(name);
             lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
             processApiResponse(lastApiResponse);
@@ -142,7 +156,8 @@ public class BasicSteps {
         }
     }
 
-    @When("^I POST the event payload to the /events endpoint$")
+
+    @When("^I POST the event payload to the /events endpoint")
     public void iPOSTTheEventPayloadToTheEventsEndpoint() throws Throwable {
         try {
             lastApiResponse = api.eventProcessWithHttpInfo(event);
@@ -156,8 +171,9 @@ public class BasicSteps {
         ====  GETS  ====
     */
 
-    @When("^I send a GET to the /badges endpoint$")
-    public void iSendAGETToTheBadgesEndpoint() {
+
+    @When("^A unregistered application send a GET to the /badges endpoint")
+    public void aUnregisteredApplicationSendAGETToTheBadgesEndpoint() {
         try {
             lastApiResponse = api.getBadgesWithHttpInfo();
             processApiResponse(lastApiResponse);
@@ -166,10 +182,25 @@ public class BasicSteps {
         }
     }
 
-    @When("I send a GET to the badge URL in the location header")
-    public void iSendAGETToTheURLInTheLocationHeaderBadges() {
-        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+    @When("The application {string} send a GET to the \\/badges endpoint")
+    public void theApplicationSendAGETToTheBadgesEndpoint(String applicationReference) {
         try {
+
+            checkCurrentApplication(applicationReference);
+
+            lastApiResponse = api.getBadgesWithHttpInfo();
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} send a GET to the badge URL in the location header")
+    public void theApplicationSendAGETToTheURLInTheLocationHeaderBadges(String applicationReference) {
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        try {
+            checkCurrentApplication(applicationReference);
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
             lastReceivedBadge = (Badge) lastApiResponse.getData();
@@ -178,8 +209,9 @@ public class BasicSteps {
         }
     }
 
-    @When("^I send a GET to the /pointScales endpoint$")
-    public void iSendAGETToThePointScalesEndpoint() {
+
+    @When("^A unregistered application send a GET to the \\/pointScale endpoint")
+    public void aUnregisteredApplicationSendAGETToThePointScaleEndpoint() {
         try {
             lastApiResponse = api.getPointScalesWithHttpInfo();
             processApiResponse(lastApiResponse);
@@ -188,17 +220,32 @@ public class BasicSteps {
         }
     }
 
-    @When("I send a GET to the pointScale URL in the location header")
-    public void iSendAGETToThePointScaleURLInTheLocationHeader() {
-        Integer id = Integer.parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+    @When("The application {string} send a GET to the \\/pointScales endpoint")
+    public void theApplicationSendAGETToThePointScalesEndpoint(String applicationReference) {
         try {
+            checkCurrentApplication(applicationReference);
+            lastApiResponse = api.getPointScalesWithHttpInfo();
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} send a GET to the pointScale URL in the location header")
+    public void theApplicationSendAGETToThePointScaleURLInTheLocationHeader(String applicationReference) {
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        try {
+            checkCurrentApplication(applicationReference);
             lastApiResponse = api.getPointScaleWithHttpInfo(id);
             processApiResponse(lastApiResponse);
             lastReceivedPointScale = (PointScale) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
+
     }
+
 
     @When("I send a GET to the user URL in the location header")
     public void iSendAGETToTheUserURLInTheLocationHeader() {
@@ -225,18 +272,18 @@ public class BasicSteps {
         ====  RECEPTION  ====
     */
 
-    @Then("I receive a {int} status code")
-    public void iReceiveAStatusCode(int expectedStatusCode) throws Throwable {
+    @Then("The application receive a {int} status code")
+    public void theApplicationReceiveAStatusCode(int expectedStatusCode) throws Throwable {
         assertEquals(expectedStatusCode, lastStatusCode);
     }
 
-    @And("I receive a payload that is the same as the badge payload")
-    public void iReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
+    @And("The application receive a payload that is the same as the badge payload")
+    public void theApplicationReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
         assertEquals(badge, lastReceivedBadge);
     }
 
-    @And("I receive a payload that is the same as the pointScale payload")
-    public void iReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
+    @And("The application receive a payload that is the same as the pointScale payload")
+    public void theApplicationReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
         assertEquals(pointScale, lastReceivedPointScale);
     }
 
@@ -249,20 +296,24 @@ public class BasicSteps {
         Assert.assertTrue(lastReceivedUserString.contains("badges"));
     }
 
-    @And("I receive a list containing {int} badge\\(s)")
-    public void iReceiveAListContainingBadgeS(int size) {
+    @And("The application {string} receive a list containing {int} badge\\(s)")
+    public void theApplicationReceiveAListContainingBadgeS(String applicationReference, int size) {
+
+        checkCurrentApplication(applicationReference);
         List<Badge> badges = (List<Badge>) lastApiResponse.getData();
         assertEquals(badges.size(), size);
     }
 
-    @And("I receive a list containing {int} pointScale\\(s)")
-    public void iReceiveAListContainingPointScaleS(int size) {
+    @And("The application {string} receive a list containing {int} pointScale\\(s)")
+    public void theApplicationReceiveAListContainingPointScaleS(String applicationReference, int size) {
+
+        checkCurrentApplication(applicationReference);
         List<PointScale> pointScales = (List<PointScale>) lastApiResponse.getData();
         assertEquals(pointScales.size(), size);
     }
 
-    @And("I receive a badge that was created today")
-    public void iReceiveABadgeThatWasCreatedToday() {
+    @And("The application receive a badge that was created today")
+    public void theApplicationReceiveABadgeThatWasCreatedToday() {
         assertEquals(badge.getObtainedDate(), LocalDate.now());
     }
 
@@ -285,4 +336,13 @@ public class BasicSteps {
         lastApiException = apiException;
         lastStatusCode = lastApiException.getCode();
     }
+
+    // change api key if needed
+    private void checkCurrentApplication(String applicationReference) {
+        if (apiKey.getValue() != applications.get(applicationReference).getValue()) {
+            apiKey = applications.get(applicationReference);
+            api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
+        }
+    }
+
 }
