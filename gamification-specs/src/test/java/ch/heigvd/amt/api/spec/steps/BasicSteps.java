@@ -255,7 +255,10 @@ public class BasicSteps {
 
     @And("I receive a payload that is the same as the badge payload")
     public void iReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
-        assertEquals(badge, lastReceivedBadge);
+        // Dont check links
+        assertEquals(badge.getName(), lastReceivedBadge.getName());
+        assertEquals(badge.getObtainedDate(), lastReceivedBadge.getObtainedDate());
+        assertEquals(badge.getImageUrl(), lastReceivedBadge.getImageUrl());
     }
 
     @And("I receive a payload that is the same as the pointScale payload")

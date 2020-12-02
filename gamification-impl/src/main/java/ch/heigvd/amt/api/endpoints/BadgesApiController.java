@@ -1,6 +1,7 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.BadgesApi;
+import ch.heigvd.amt.api.model.Link;
 import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.api.model.Badge;
@@ -21,9 +22,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.ServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.net.URISyntaxException;
+import java.util.*;
 
 @RestController
 public class BadgesApiController implements BadgesApi {
@@ -58,30 +58,38 @@ public class BadgesApiController implements BadgesApi {
 
     @Override
     public ResponseEntity<List<Badge>> getBadges() {
-        String apiKeyId = (String) servletRequest.getAttribute("Application");
+        try {
+            String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(apiKeyId);
+            Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(apiKeyId);
 
-        List<Badge> badges = new ArrayList<>();
+            List<Badge> badges = new ArrayList<>();
 
-        if (badgeEntities.isPresent()) {
-            for (BadgeEntity badgeEntity : badgeEntities.get()) {
-                badges.add(toBadge(badgeEntity));
+            if (badgeEntities.isPresent()) {
+                for (BadgeEntity badgeEntity : badgeEntities.get()) {
+                    badges.add(toBadge(badgeEntity));
+                }
             }
-        }
 
-        return ResponseEntity.ok(badges);
+            return ResponseEntity.ok(badges);
+        } catch (URISyntaxException e) { // If the URI is not valid
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @Override
     public ResponseEntity<Badge> getBadge(Integer id) {
-        String apiKeyId = (String) servletRequest.getAttribute("Application");
+        try {
+            String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        BadgeEntity existingBadgeEntity =
-                badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            BadgeEntity existingBadgeEntity =
+                    badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return ResponseEntity.ok(toBadge(existingBadgeEntity));
+            return ResponseEntity.ok(toBadge(existingBadgeEntity));
+        } catch (URISyntaxException e) { // If the URI is not valid
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
@@ -98,10 +106,11 @@ public class BadgesApiController implements BadgesApi {
             BadgeEntity patchedBadgeEntity = applyPatchToBadge(patch, existingBadgeEntity);
             badgeRepository.save(patchedBadgeEntity);
             return ResponseEntity.ok(toBadge(patchedBadgeEntity));
-        } catch (JsonPatchException | JsonProcessingException e) {
+        } catch (JsonPatchException | JsonProcessingException | URISyntaxException e) {// If the URI is not valid
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+
     }
 
 
@@ -125,11 +134,14 @@ public class BadgesApiController implements BadgesApi {
      * @param entity : badge entity
      * @return badge
      */
-    private Badge toBadge(BadgeEntity entity) {
+    private Badge toBadge(BadgeEntity entity) throws URISyntaxException {
         Badge badge = new Badge();
         badge.setName(entity.getName());
         badge.setObtainedDate(entity.getObtainedDate());
         badge.setImageUrl(entity.getImageUrl());
+        Link self = new Link();
+        self.self(new URI(servletRequest.getLocalAddr() + "/badges/" + entity.getId()));
+        badge.setLinks(Collections.singletonList(self));
         return badge;
     }
 
