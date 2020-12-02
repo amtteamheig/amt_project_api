@@ -8,9 +8,9 @@ Feature: Check the API-Key
   #
 
   Scenario: try to access to badges without API-Key
-    When A unregistered application send a GET to the /badges endpoint
-    Then The application receive a 401 status code
+    When A unregistered application sends a GET to the /badges endpoint
+    Then The application receives a 401 status code
 
   Scenario: try to access to pointScales without API-Key
-    When A unregistered application send a GET to the /pointScale endpoint
-    Then The application receive a 401 status code
+    When A unregistered application sends a GET to the /pointScale endpoint
+    Then The application receives a 401 status code
