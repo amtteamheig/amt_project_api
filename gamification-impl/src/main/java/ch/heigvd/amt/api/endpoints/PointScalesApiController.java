@@ -55,10 +55,8 @@ public class PointScalesApiController implements PointScalesApi {
     public ResponseEntity<List<PointScale>> getPointScales() {
 
         String apiKeyId = (String) servletRequest.getAttribute("Application");
-
         Optional<List<PointScaleEntity>> pointScalesEntries =
                 pointScaleRepository.findByApiKeyEntityValue(apiKeyId);
-
         List<PointScale> pointScales = new ArrayList<>();
 
         if (pointScalesEntries.isPresent()) {

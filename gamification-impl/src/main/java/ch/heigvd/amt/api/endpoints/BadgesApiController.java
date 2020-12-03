@@ -54,10 +54,9 @@ public class BadgesApiController implements BadgesApi {
 
     @Override
     public ResponseEntity<List<Badge>> getBadges() {
+
         String apiKeyId = (String) servletRequest.getAttribute("Application");
-
         Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(apiKeyId);
-
         List<Badge> badges = new ArrayList<>();
 
         if (badgeEntities.isPresent()) {

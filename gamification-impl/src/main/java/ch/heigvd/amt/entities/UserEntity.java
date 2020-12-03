@@ -23,7 +23,11 @@ public class UserEntity {
     @Id
     private String id;
 
-    //TODO placeholder for now, to show basic principle
+    @ManyToOne
+    @JoinColumn(name = "fk_apikey")
+    private ApiKeyEntity apiKeyEntity;
+
+    //TODO
 
     /*
     @OneToMany(mappedBy = "user")

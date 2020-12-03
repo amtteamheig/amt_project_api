@@ -4,6 +4,8 @@ import ch.heigvd.amt.api.UsersApi;
 import ch.heigvd.amt.api.model.User;
 import ch.heigvd.amt.api.model.User;
 import ch.heigvd.amt.api.model.User;
+import ch.heigvd.amt.api.model.User;
+import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.entities.UserEntity;
@@ -15,8 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.ServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UsersController implements UsersApi {
@@ -24,19 +28,33 @@ public class UsersController implements UsersApi {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ServletRequest servletRequest;
+
     @Override
     public ResponseEntity<User> getUser(String id) {
-        UserEntity existingUserEntity = userRepository.findById(id)
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
+
+        UserEntity existingUserEntity =
+                userRepository.findByApiKeyEntityValue_AndId(apiKeyId,id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         return ResponseEntity.ok(toUser(existingUserEntity));
     }
 
     @Override
     public ResponseEntity<List<User>> getUsers() {
+
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
+        Optional<List<UserEntity>> userEntities = userRepository.findByApiKeyEntityValue(apiKeyId);
         List<User> users = new ArrayList<>();
-        for (UserEntity userEntity : userRepository.findAll()) {
-            users.add(toUser(userEntity));
+
+        if (userEntities.isPresent()) {
+            for (UserEntity userEntity : userEntities.get()) {
+                users.add(toUser(userEntity));
+            }
         }
+
         return ResponseEntity.ok(users);
     }
 
