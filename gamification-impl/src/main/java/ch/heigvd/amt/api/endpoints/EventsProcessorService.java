@@ -46,7 +46,7 @@ public class EventsProcessorService implements EventsApi {
         userRepository.save(user);
 
         //TODO handle rules
-        
+
         return ResponseEntity.ok().build();
     }
 

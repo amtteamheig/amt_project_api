@@ -1,18 +1,10 @@
 package ch.heigvd.amt.entities;
 
-import ch.heigvd.amt.api.model.Badge;
-import ch.heigvd.amt.api.model.PointScale;
-import ch.heigvd.amt.api.model.UserPoints;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
