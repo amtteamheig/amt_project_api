@@ -23,10 +23,10 @@ public class UserEntity {
     @JoinColumn(name = "fk_apikey")
     private ApiKeyEntity apiKeyEntity;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<BadgeAwardEntity> badgesAwards = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<PointScaleAwardEntity> pointsAwards = new ArrayList<>();
 
 

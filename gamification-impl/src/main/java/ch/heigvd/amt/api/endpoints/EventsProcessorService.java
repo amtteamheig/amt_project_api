@@ -55,6 +55,11 @@ public class EventsProcessorService implements EventsApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        //make sure event user ID isn't null
+        if(event.getUserId() == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
         Optional<UserEntity> userInRep = userRepository.findById(event.getUserId());
         UserEntity user;
 
@@ -86,6 +91,7 @@ public class EventsProcessorService implements EventsApi {
     private boolean handleRules(Event event, UserEntity user){
 
         //TODO : Change reason for something else than the type of the rule
+        //TODO : Check if badge and pointScale exists
 
         Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_Type(event.getType());
 
