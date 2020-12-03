@@ -1,10 +1,14 @@
 package ch.heigvd.amt.entities;
 
+import ch.heigvd.amt.entities.awards.BadgeAwardEntity;
+import ch.heigvd.amt.entities.awards.PointScaleAwardEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,29 +23,11 @@ public class UserEntity {
     @JoinColumn(name = "fk_apikey")
     private ApiKeyEntity apiKeyEntity;
 
-    //TODO
+    @OneToMany
+    private List<BadgeAwardEntity> badgesAwards = new ArrayList<>();
 
-    /*
-    @OneToMany(mappedBy = "user")
-    private List<BadgeEntity> badges = new ArrayList<>();
+    @OneToMany
+    private List<PointScaleAwardEntity> pointsAwards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<UserPointsEntity> points = new ArrayList<>();
 
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Entity
-    @Data
-    public static class UserPointsEntity {
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Integer id;
-
-        @ManyToOne(mappedBy = "user_points")
-        private PointScaleEntity pointScale;
-
-        private Integer amount;
-    }
-    */
 }

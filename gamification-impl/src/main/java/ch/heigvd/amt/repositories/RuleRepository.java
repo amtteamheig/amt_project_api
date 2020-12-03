@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface RuleRepository extends JpaRepository<RuleEntity, Long> {
     Optional<List<RuleEntity>> findByApiKeyEntityValue(String apiKeyId);
     Optional<RuleEntity> findByApiKeyEntityValue_AndId(String apiKeyId, Long id);
+    Optional<RuleEntity> findBy_if_Type(String type);
 }
