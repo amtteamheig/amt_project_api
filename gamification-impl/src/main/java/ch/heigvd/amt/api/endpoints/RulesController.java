@@ -2,6 +2,9 @@ package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.RulesApi;
 import ch.heigvd.amt.api.RulesApi;
+import ch.heigvd.amt.api.model.RuleIf;
+import ch.heigvd.amt.api.model.RuleThen;
+import ch.heigvd.amt.api.model.RuleThenAwardPoints;
 import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.RuleEntity;
 import ch.heigvd.amt.api.model.Rule;
@@ -101,8 +104,21 @@ public class RulesController implements RulesApi {
      * @return rule entity
      */
     private RuleEntity toRuleEntity(Rule rule) {
-        RuleEntity entity = new RuleEntity();
-        return entity;
+        return RuleEntity.builder()
+                ._if(RuleEntity.If.builder()
+                        .type(rule.getIf().getType())
+                        .build()
+                )
+                ._then(RuleEntity.Then.builder()
+                        .awardBadge(rule.getThen().getAwardBadge().toString())
+                        .awardPoints(RuleEntity.Then.AwardPoints.builder()
+                                        .amount(rule.getThen().getAwardPoints().getAmount())
+                                        .pointScale(rule.getThen().getAwardPoints().getPointScale().toString())
+                                        .build()
+                        )
+                        .build()
+                )
+                .build();
     }
 
     /**
@@ -112,6 +128,16 @@ public class RulesController implements RulesApi {
      */
     private Rule toRule(RuleEntity entity) {
         Rule rule = new Rule();
+        RuleIf ruleIf = new RuleIf();
+        RuleThen ruleThen = new RuleThen();
+        RuleThenAwardPoints ruleThenAwardPoints = new RuleThenAwardPoints();
+        ruleThenAwardPoints.setAmount(entity.get_then().getAwardPoints().getAmount());
+        ruleThenAwardPoints.setPointScale(URI.create(entity.get_then().getAwardPoints().getPointScale()));
+        ruleThen.setAwardPoints(ruleThenAwardPoints);
+        ruleThen.setAwardBadge(URI.create(entity.get_then().getAwardBadge()));
+        ruleIf.setType(entity.get_if().getType());
+        rule.setIf(ruleIf);
+        rule.setThen(ruleThen);
         return rule;
     }
 
