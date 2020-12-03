@@ -31,6 +31,11 @@ public class UsersController implements UsersApi {
     @Autowired
     ServletRequest servletRequest;
 
+    /**
+     * Servlet entry point GET users/id
+     * @param id user's Id
+     * @return response
+     */
     @Override
     public ResponseEntity<User> getUser(String id) {
         String apiKeyId = (String) servletRequest.getAttribute("Application");
@@ -42,6 +47,10 @@ public class UsersController implements UsersApi {
         return ResponseEntity.ok(toUser(existingUserEntity));
     }
 
+    /**
+     * Servlet entry point GET users
+     * @return response
+     */
     @Override
     public ResponseEntity<List<User>> getUsers() {
 

@@ -32,6 +32,11 @@ public class EventsProcessorService implements EventsApi {
     @Autowired
     ServletRequest servletRequest;
 
+    /**
+     * Servlet entry point
+     * @param event (optional) event object built by user
+     * @return response
+     */
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> eventProcess(@Valid Event event) {
@@ -43,11 +48,23 @@ public class EventsProcessorService implements EventsApi {
 
         UserEntity user = UsersController.toUserEntity(event.getUserId());
         user.setApiKeyEntity(apiKey);
-        userRepository.save(user);
 
         //TODO handle rules
 
+
+        userRepository.save(user);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * handles rules
+     * @param event current event
+     * @param user current user
+     * @return true if a rule with event type was found
+     */
+    private boolean handleRules(Event event, UserEntity user){
+
+        return false;
     }
 
 }
