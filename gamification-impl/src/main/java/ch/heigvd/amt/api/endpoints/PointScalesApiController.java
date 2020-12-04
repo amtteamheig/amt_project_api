@@ -4,7 +4,6 @@ import ch.heigvd.amt.api.PointScalesApi;
 import ch.heigvd.amt.api.model.JsonPatchDocument;
 import ch.heigvd.amt.api.model.Link;
 import ch.heigvd.amt.entities.ApiKeyEntity;
-import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.entities.PointScaleEntity;
 import ch.heigvd.amt.api.model.PointScale;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
@@ -80,9 +79,10 @@ public class PointScalesApiController implements PointScalesApi {
                     pointScales.add(toPointScale(pointScaleEntity));
                 }
             }
+
             return ResponseEntity.ok(pointScales);
         } catch (URISyntaxException e) {// If the URI is not valid
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't create the link URI");
         }
     }
 
@@ -94,11 +94,12 @@ public class PointScalesApiController implements PointScalesApi {
 
             PointScaleEntity existingPointScaleEntity =
                     pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Can't found point scale related to this apikey"));
 
             return ResponseEntity.ok(toPointScale(existingPointScaleEntity));
         } catch (URISyntaxException e) {// If the URI is not valid
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't create the link URI");
         }
     }
 
@@ -110,9 +111,8 @@ public class PointScalesApiController implements PointScalesApi {
                 pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED));
 
-
+        // Convert into JsonPatch
         List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
-
 
         for (JsonPatch jsonPatch : jsonPatches) {
             PointScaleEntity patched = patch(jsonPatch, existingPointScale);
@@ -123,6 +123,12 @@ public class PointScalesApiController implements PointScalesApi {
 
     }
 
+    /**
+     * Converts a point scale to a point scale entity
+     *
+     * @param pointScale point scale
+     * @return point scale entity
+     */
     private PointScaleEntity toPointScaleEntity(PointScale pointScale) {
         PointScaleEntity entity = new PointScaleEntity();
         entity.setName(pointScale.getName());
@@ -130,6 +136,13 @@ public class PointScalesApiController implements PointScalesApi {
         return entity;
     }
 
+    /**
+     * Converts a point scale entity to a point scale
+     *
+     * @param entity badge entity
+     * @return point scale
+     * @throws URISyntaxException
+     */
     private PointScale toPointScale(PointScaleEntity entity) throws URISyntaxException {
         PointScale pointScale = new PointScale();
         pointScale.setName(entity.getName());
@@ -140,6 +153,13 @@ public class PointScalesApiController implements PointScalesApi {
         return pointScale;
     }
 
+    /**
+     * Performs changes indicated in the patch
+     *
+     * @param patch            Changes that need to be performed
+     * @param targetPointScale Where apply this changes
+     * @return the patched entity
+     */
     private PointScaleEntity patch(JsonPatch patch, PointScaleEntity targetPointScale) {
 
         JsonStructure target = objectMapper.convertValue(targetPointScale, JsonStructure.class);

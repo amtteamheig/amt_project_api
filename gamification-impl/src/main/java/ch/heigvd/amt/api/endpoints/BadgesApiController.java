@@ -76,7 +76,7 @@ public class BadgesApiController implements BadgesApi {
 
             return ResponseEntity.ok(badges);
         } catch (URISyntaxException e) { // If the URI is not valid
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't create the link URI");
         }
     }
 
@@ -87,11 +87,12 @@ public class BadgesApiController implements BadgesApi {
 
             BadgeEntity existingBadgeEntity =
                     badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Can't the badge entity in the repository"));
 
             return ResponseEntity.ok(toBadge(existingBadgeEntity));
         } catch (URISyntaxException e) { // If the URI is not valid
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't create the link URI");
         }
     }
 
@@ -102,7 +103,8 @@ public class BadgesApiController implements BadgesApi {
 
         BadgeEntity existingBadgeEntity =
                 badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Can't the badge entity in the repository"));
 
         List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
 
@@ -134,6 +136,7 @@ public class BadgesApiController implements BadgesApi {
      *
      * @param entity : badge entity
      * @return badge
+     * @throws URISyntaxException
      */
     private Badge toBadge(BadgeEntity entity) throws URISyntaxException {
         Badge badge = new Badge();
@@ -146,6 +149,13 @@ public class BadgesApiController implements BadgesApi {
         return badge;
     }
 
+    /**
+     * Performs changes indicated in the patch
+     *
+     * @param patch       Changes that need to be performed
+     * @param targetBadge Where apply this changes
+     * @return the patched entity
+     */
     private BadgeEntity patch(JsonPatch patch, BadgeEntity targetBadge) {
 
         JsonStructure target = objectMapper.convertValue(targetBadge, JsonStructure.class);
