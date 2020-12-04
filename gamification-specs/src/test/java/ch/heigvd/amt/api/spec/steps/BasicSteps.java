@@ -12,9 +12,11 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -130,11 +132,12 @@ public class BasicSteps {
     }
 
 
-    @When("The application {string} POST the {string} pointScale payload to the \\/pointScales endpoint")
+    @When("The application {string} POST the {string} pointScale payload to the /pointScales endpoint")
     public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference,
                                                                                String name) {
         try {
             checkCurrentApplication(applicationReference);
+
             pointScale.setName(name);
             lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
             processApiResponse(lastApiResponse);
@@ -264,7 +267,6 @@ public class BasicSteps {
     public void theApplicationPATCHABadgeHeRenameTheBadgeNamedInto(String applicationReference, String oldName,
                                                                    String newName) {
 
-
         try {
             checkCurrentApplication(applicationReference);
 
@@ -280,7 +282,6 @@ public class BasicSteps {
 
             String path = target.getLinks().get(0).getSelf().getPath();
 
-
             String id = path.substring(path.lastIndexOf('/') + 1);
 
             JsonPatchDocument patchDocument = new JsonPatchDocument()
@@ -289,6 +290,39 @@ public class BasicSteps {
                     .value(newName);
 
             lastApiResponse = api.patchBadgeWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} PATCH a point scale, he rename the badge named {string} into {string}")
+    public void theApplicationPATCHAPointScaleHeRenameTheBadgeNamedInto(String applicationReference, String oldName,
+                                                                        String newName) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<PointScale>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScale> pointScales = getPointScalesResponse.getData();
+            PointScale target = null;
+            for (PointScale pointScale : pointScales) {
+                if (pointScale.getName().equals(oldName)) {
+                    target = pointScale;
+                    break;
+                }
+            }
+
+            String path = target.getLinks().get(0).getSelf().getPath();
+
+            String id = path.substring(path.lastIndexOf('/') + 1);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value(newName);
+
+            lastApiResponse = api.patchPointScaleWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -314,7 +348,8 @@ public class BasicSteps {
 
     @And("The application receives a payload that is the same as the pointScale payload")
     public void theApplicationReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
-        assertEquals(pointScale, lastReceivedPointScale);
+        assertEquals(pointScale.getName(), lastReceivedPointScale.getName());
+        assertEquals(pointScale.getDescription(), lastReceivedPointScale.getDescription());
     }
 
     @And("I receive a payload with points and badges")
@@ -382,5 +417,6 @@ public class BasicSteps {
             api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
         }
     }
+
 
 }

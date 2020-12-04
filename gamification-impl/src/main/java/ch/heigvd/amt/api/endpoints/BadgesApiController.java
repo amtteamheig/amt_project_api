@@ -19,10 +19,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.json.*;
 import javax.servlet.ServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+
+import static ch.heigvd.amt.api.util.Patch.toJsonPatch;
 
 @RestController
 public class BadgesApiController implements BadgesApi {
@@ -97,30 +98,21 @@ public class BadgesApiController implements BadgesApi {
 
     @Override
     public ResponseEntity<Void> patchBadge(Integer id, @Valid List<JsonPatchDocument> jsonPatchDocument) {
+        String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        try {
+        BadgeEntity existingBadgeEntity =
+                badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
 
-            String apiKeyId = (String) servletRequest.getAttribute("Application");
+        for (JsonPatch jsonPatch : jsonPatches) {
 
-            BadgeEntity existingBadgeEntity =
-                    badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-            List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
-
-            for (JsonPatch jsonPatch : jsonPatches) {
-
-                BadgeEntity patched = patch(jsonPatch, existingBadgeEntity, BadgeEntity.class);
-                badgeRepository.save(patched);
-            }
-            return ResponseEntity.ok().build();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-
+            BadgeEntity patched = patch(jsonPatch, existingBadgeEntity);
+            // If the entity already exists, save() will update it
+            badgeRepository.save(patched);
         }
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -154,31 +146,13 @@ public class BadgesApiController implements BadgesApi {
         return badge;
     }
 
-    private <T> T patch(JsonPatch patch, T targetBadge, Class<T> clazz) {
+    private BadgeEntity patch(JsonPatch patch, BadgeEntity targetBadge) {
 
         JsonStructure target = objectMapper.convertValue(targetBadge, JsonStructure.class);
 
         JsonValue patchedValue = patch.apply(target);
 
-        return objectMapper.convertValue(patchedValue, clazz);
+        return objectMapper.convertValue(patchedValue, BadgeEntity.class);
 
-    }
-
-    private List<JsonPatch> toJsonPatch(List<JsonPatchDocument> jsonPatchDocuments) throws IOException {
-        List<JsonPatch> jsonPatches = new ArrayList<>();
-
-
-        for (JsonPatchDocument doc : jsonPatchDocuments) {
-            JsonPatchBuilder builder = Json.createPatchBuilder();
-            switch (doc.getOp()) {
-                case REPLACE:
-                    builder.replace(doc.getPath(), doc.getValue().toString());
-                    break;
-            }
-
-            jsonPatches.add(builder.build());
-        }
-
-        return jsonPatches;
     }
 }

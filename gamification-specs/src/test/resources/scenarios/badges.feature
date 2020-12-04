@@ -38,7 +38,7 @@ Feature: Validation of badges implementation
     Then The application receives a 200 status code
     And The application receives a badge that was created today
 
-  Scenario: update badge
+  Scenario: update badge performs correctly
     Given The application has a badge payload
     When The application "A1" POST the "Platinum" badge payload to the /badges endpoint
     Then The application receives a 201 status code

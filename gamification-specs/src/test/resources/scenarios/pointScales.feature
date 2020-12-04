@@ -26,3 +26,10 @@ Feature: Check server is running
     And The application "A2" POST the "Bronze Rank" pointScale payload to the /pointScales endpoint
     Then The application "A1" GET to the /pointScales endpoint receive a list containing 2 pointScale(s)
     And The application "A2" GET to the /pointScales endpoint receive a list containing 1 pointScale(s)
+
+  Scenario: update point scale performs correctly
+    Given The application has a pointScale payload
+    When The application "A1" POST the "Platinum Rank" pointScale payload to the /pointScales endpoint
+    Then The application receives a 201 status code
+    When The application "A1" PATCH a point scale, he rename the badge named "Platinum Rank" into "Wood Rank"
+    Then The application receives a 200 status code
