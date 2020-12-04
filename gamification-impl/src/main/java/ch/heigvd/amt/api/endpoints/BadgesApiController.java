@@ -109,9 +109,10 @@ public class BadgesApiController implements BadgesApi {
 
             List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
 
-            for (JsonPatch patch : jsonPatches) {
+            for (JsonPatch jsonPatch : jsonPatches) {
 
-                patchBadge(patch, existingBadgeEntity);
+                BadgeEntity patched = patch(jsonPatch, existingBadgeEntity, BadgeEntity.class);
+                badgeRepository.save(patched);
             }
             return ResponseEntity.ok().build();
 
@@ -153,15 +154,13 @@ public class BadgesApiController implements BadgesApi {
         return badge;
     }
 
-    private void patchBadge(JsonPatch patch, BadgeEntity targetBadge) {
+    private <T> T patch(JsonPatch patch, T targetBadge, Class<T> clazz) {
 
         JsonStructure target = objectMapper.convertValue(targetBadge, JsonStructure.class);
 
         JsonValue patchedValue = patch.apply(target);
 
-        BadgeEntity patchedEntity = objectMapper.convertValue(patchedValue, BadgeEntity.class);
-
-        badgeRepository.save(patchedEntity);
+        return objectMapper.convertValue(patchedValue, clazz);
 
     }
 
