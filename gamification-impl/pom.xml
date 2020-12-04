@@ -59,12 +59,6 @@
                                 <basePackage>ch.heigvd.amt</basePackage>
                                 <modelPackage>ch.heigvd.amt.api.model</modelPackage>
                             </configOptions>
-                            <importMappings>
-                                <importMapping>JsonDocument=javax.json.JsonPatch</importMapping>
-                            </importMappings>
-                            <typeMappings>
-                                <typeMapping>JsonDocument=javax.json.JsonPatch</typeMapping>
-                            </typeMappings>
                         </configuration>
                     </execution>
                 </executions>

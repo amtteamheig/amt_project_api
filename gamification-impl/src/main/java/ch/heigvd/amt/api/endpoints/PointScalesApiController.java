@@ -160,7 +160,7 @@ public class PointScalesApiController implements PointScalesApi {
     }
 
     /**
-     * Performs changes indicated in the patch
+     * Return a point scale with the modification
      *
      * @param patch            Changes that need to be performed
      * @param targetPointScale Where apply this changes

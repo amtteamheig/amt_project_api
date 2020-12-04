@@ -156,7 +156,7 @@ public class BadgesApiController implements BadgesApi {
     }
 
     /**
-     * Performs changes indicated in the patch
+     * Return a badge with the modification
      *
      * @param patch       Changes that need to be performed
      * @param targetBadge Where apply this changes
