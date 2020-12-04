@@ -4,7 +4,6 @@
 In this project we will create an API to enable any client to add a gamification value to their service. 
 
 ## Gamification Features
-A client will be able to : 
 
 ### Registration
 Before you get to play with the gamification engine, you need to register your application into our database so we can distinguish which application is being used. Doing so will give you a key that will be required in the header of your requests for all endpoints.
@@ -22,9 +21,9 @@ A rule will enable the application to determine how the user will be able to pro
 
 #### Rules Endpoints
 
-* [Create a rule](docs/pointScale.md) : `POST /pointScales`
-* [Get all rules](docs/pointScale.md) : `GET /pointScales`
-
+* [Create a rule](docs/rules_post.md) : `POST /rules`
+* [Get a specific rule](docs/rules_get_id.md) : `GET /rules/{id}`
+* [Get all rules](docs/rules_get.md) : `GET /rules`
 
 ### Create Point Scales
 Point scales enables our clients to put a name on their gamification entities.
@@ -37,8 +36,8 @@ Point scales enables our clients to put a name on their gamification entities.
 
 #### Point Scale Endpoints
 
-* [Create a point scale](docs/pointScale.md) : `POST /pointScales`
-* [Get all created point scales](docs/pointScale.md) : `GET /pointScales`
+* [Create a point scale](docs/pointScale_post.md) : `POST /pointScales`
+* [Get all created point scales](docs/pointScale_get.md) : `GET /pointScales`
 
 ### Create Badges 
 
