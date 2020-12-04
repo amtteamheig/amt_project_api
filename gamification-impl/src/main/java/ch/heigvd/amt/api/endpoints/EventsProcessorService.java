@@ -57,7 +57,7 @@ public class EventsProcessorService implements EventsApi {
 
         //make sure event user ID isn't null
         if(event.getUserId() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User id missing");
         }
 
         Optional<UserEntity> userInRep = userRepository.findByApiKeyEntityValue_AndId(apiKeyId, event.getUserId());
@@ -76,7 +76,7 @@ public class EventsProcessorService implements EventsApi {
         if(handleRules(event,user,apiKeyId)){
             userRepository.save(user);
         } else {
-            return new ResponseEntity("Cannot find Rule with type " + event.getType(), HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find Rule with type " + event.getType());
         }
 
         return ResponseEntity.ok().build();
