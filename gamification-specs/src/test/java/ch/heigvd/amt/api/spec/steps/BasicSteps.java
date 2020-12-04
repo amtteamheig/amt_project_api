@@ -10,16 +10,20 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+
 import org.junit.Assert;
 
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class BasicSteps {
 
@@ -80,6 +84,45 @@ public class BasicSteps {
 
         applicationUsers.get(applicationReference).put(userReference, user);
     }
+
+    @And("The application {string} contains a badge named {string} as {string} attribute")
+    public void theApplicationContainsABadgeNamedAsAttribute(String applicationReference, String value,
+                                                             String attribute) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<Badge>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<Badge> badges = getBadgeResponse.getData();
+
+            assertThat(badges, contains(
+                    hasProperty(attribute, is(value))
+            ));
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+
+    @And("The application {string} contains a point scale named {string} as {string} attribute")
+    public void theApplicationContainsAPointScaleNamedAsAttribute(String applicationReference, String value,
+                                                                  String attribute) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<PointScale>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScale> pointScales = getPointScalesResponse.getData();
+
+            assertThat(pointScales, contains(
+                    hasProperty(attribute, is(value))
+            ));
+
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+
+    }
+
 
     /*
         ====  PAYLOADS  ====
@@ -261,40 +304,6 @@ public class BasicSteps {
     /*
         ====  PATCH  ====
     */
-
-
-    @When("The application {string} PATCH a badge, he rename the badge named {string} into {string}")
-    public void theApplicationPATCHABadgeHeRenameTheBadgeNamedInto(String applicationReference, String oldName,
-                                                                   String newName) {
-
-        try {
-            checkCurrentApplication(applicationReference);
-
-            ApiResponse<List<Badge>> getBadgeResponse = api.getBadgesWithHttpInfo();
-            List<Badge> badges = getBadgeResponse.getData();
-            Badge target = null;
-            for (Badge badge : badges) {
-                if (badge.getName().equals(oldName)) {
-                    target = badge;
-                    break;
-                }
-            }
-
-            String path = target.getLinks().get(0).getSelf().getPath();
-
-            String id = path.substring(path.lastIndexOf('/') + 1);
-
-            JsonPatchDocument patchDocument = new JsonPatchDocument()
-                    .op(JsonPatchDocument.OpEnum.REPLACE)
-                    .path("/name")
-                    .value(newName);
-
-            lastApiResponse = api.patchBadgeWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
-            processApiResponse(lastApiResponse);
-        } catch (ApiException e) {
-            processApiException(e);
-        }
-    }
 
     @When("The application {string} PATCH a badge with the id {int}")
     public void theApplicationPATCHABadgeWithTheId(String applicationReference, int id) {
@@ -491,5 +500,6 @@ public class BasicSteps {
             api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
         }
     }
+
 
 }

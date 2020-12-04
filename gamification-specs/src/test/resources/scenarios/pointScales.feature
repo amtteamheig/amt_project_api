@@ -33,6 +33,8 @@ Feature: Check server is running
     Then The application receives a 201 status code
     When The application "A1" PATCH a point scale named "Platinum Rank", he want to change the attribute "name" with the value "Wood Rank"
     Then The application receives a 200 status code
+    And The application "A1" contains a point scale named "Wood Rank" as "name" attribute
+
 
   Scenario: update point scale with a incorrect id
     When The application "A1" PATCH a point scale with the id 99
