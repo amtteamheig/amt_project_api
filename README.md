@@ -37,11 +37,19 @@ Point scales enables our clients to put a name on their gamification entities.
 #### Point Scale Endpoints
 
 * [Create a point scale](docs/pointScale_post.md) : `POST /pointScales`
+* [Get a specific point scale](docs/pointScales_get_id.md) : `GET /pointScales/{id}`
 * [Get all created point scales](docs/pointScale_get.md) : `GET /pointScales`
 
 ### Create Badges 
 
-The client will be able to create badges. A badge can be rewarded to their users.
+The client will be able to create badges. A badge can be rewarded to their users as a specific accomplishement defined by a rule.
 
-* Create point scales = 
-* Create rules
+*Example :*
+
+*1) I upvoted 1'000 posts, I received the badge "Go Outside!"*
+
+#### Badges Endpoints
+
+* [Create a badge](docs/badges_post.md) : `POST /badges`
+* [Get a specific badge](docs/badges_get_id.md) : `GET /badges/{id}`
+* [Get all badges](docs/badges_get.md) : `GET /badges`

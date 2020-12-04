@@ -1,8 +1,8 @@
-# Get a specific rule
+# Get a specific badge
 
-Used to get a specific rule from the current api-key.
+Used to get a specific badge from the current api-key.
 
-**URL** : `/rules/{id}`
+**URL** : `/badges/{id}`
 
 **Method** : `GET`
 
@@ -24,16 +24,9 @@ Used to get a specific rule from the current api-key.
 
 ```json
 {
-  "if": {
-    "type": "string"
-  },
-  "then": {
-    "awardBadge": "string",
-    "awardPoints": {
-      "pointScale": "string",
-      "amount": 0
-    }
-  }
+  "name": "string",
+  "obtainedDate": "2020-12-04",
+  "imageUrl": "string"
 }
 ```
 

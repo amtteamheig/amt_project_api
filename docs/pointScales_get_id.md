@@ -1,8 +1,8 @@
-# Get a specific rule
+# Get a specific point scale
 
-Used to get a specific rule from the current api-key.
+Used to get a specific point scale from the current api-key.
 
-**URL** : `/rules/{id}`
+**URL** : `/pointScales/{id}`
 
 **Method** : `GET`
 
@@ -24,16 +24,8 @@ Used to get a specific rule from the current api-key.
 
 ```json
 {
-  "if": {
-    "type": "string"
-  },
-  "then": {
-    "awardBadge": "string",
-    "awardPoints": {
-      "pointScale": "string",
-      "amount": 0
-    }
-  }
+  "name": "string",
+  "description": "string"
 }
 ```
 
