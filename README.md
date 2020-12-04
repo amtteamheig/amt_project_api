@@ -3,7 +3,7 @@
 ## Introduction
 In this project we will create an API to enable any client to add a gamification value to their service. 
 
-## Gamification Features
+## Gamification Features
 
 ### Registration
 Before you get to play with the gamification engine, you need to register your application into our database so we can distinguish which application is being used. Doing so will give you a key that will be required in the header of your requests for all endpoints.
