@@ -14,10 +14,7 @@ import org.junit.Assert;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -134,7 +131,8 @@ public class BasicSteps {
 
 
     @When("The application {string} POST the {string} pointScale payload to the \\/pointScales endpoint")
-    public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference, String name) {
+    public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference,
+                                                                               String name) {
         try {
             checkCurrentApplication(applicationReference);
             pointScale.setName(name);
@@ -262,16 +260,38 @@ public class BasicSteps {
     */
 
 
-    @When("I PATCH the last  send badge and change the name with {string}")
-    public void iPATCHTheLastRequestAndChangeTheNameWith(String newName) {
+    @When("The application {string} PATCH a badge, he rename the badge named {string} into {string}")
+    public void theApplicationPATCHABadgeHeRenameTheBadgeNamedInto(String applicationReference, String oldName,
+                                                                   String newName) {
+
+
         try {
-            lastApiResponse = api.getBadgesWithHttpInfo();
-            badge = (Badge) lastApiResponse.getData();
+            checkCurrentApplication(applicationReference);
 
-          //  lastApiResponse = api.patchBadgesWithHttpInfo();
+            ApiResponse<List<Badge>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<Badge> badges = getBadgeResponse.getData();
+            Badge target = null;
+            for (Badge badge : badges) {
+                if (badge.getName().equals(oldName)) {
+                    target = badge;
+                    break;
+                }
+            }
 
+            String path = target.getLinks().get(0).getSelf().getPath();
+
+
+            String id = path.substring(path.lastIndexOf('/') + 1);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value(newName);
+
+            lastApiResponse = api.patchBadgeWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
         } catch (ApiException e) {
-            e.printStackTrace();
+            processApiException(e);
         }
     }
 
@@ -362,4 +382,5 @@ public class BasicSteps {
             api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
         }
     }
+
 }
