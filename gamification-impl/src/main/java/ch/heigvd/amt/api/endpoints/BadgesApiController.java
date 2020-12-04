@@ -99,22 +99,28 @@ public class BadgesApiController implements BadgesApi {
 
     @Override
     public ResponseEntity<Void> patchBadge(Integer id, @Valid List<JsonPatchDocument> jsonPatchDocument) {
-        String apiKeyId = (String) servletRequest.getAttribute("Application");
+        try {
 
-        BadgeEntity existingBadgeEntity =
-                badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                "Can't the badge entity in the repository"));
+            String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
+            BadgeEntity existingBadgeEntity =
+                    badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Can't the badge entity in the repository"));
 
-        for (JsonPatch jsonPatch : jsonPatches) {
+            List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
 
-            BadgeEntity patched = patch(jsonPatch, existingBadgeEntity);
-            // If the entity already exists, save() will update it
-            badgeRepository.save(patched);
+            for (JsonPatch jsonPatch : jsonPatches) {
+
+                BadgeEntity patched = patch(jsonPatch, existingBadgeEntity);
+                // If the entity already exists, save() will update it
+                badgeRepository.save(patched);
+            }
+            return ResponseEntity.ok().build();
+
+        } catch (JsonException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The body is malformed");
         }
-        return ResponseEntity.ok().build();
     }
 
     /**
@@ -156,7 +162,7 @@ public class BadgesApiController implements BadgesApi {
      * @param targetBadge Where apply this changes
      * @return the patched entity
      */
-    private BadgeEntity patch(JsonPatch patch, BadgeEntity targetBadge) {
+    private BadgeEntity patch(JsonPatch patch, BadgeEntity targetBadge) throws JsonException {
 
         JsonStructure target = objectMapper.convertValue(targetBadge, JsonStructure.class);
 

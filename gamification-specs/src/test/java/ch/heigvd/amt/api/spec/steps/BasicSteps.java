@@ -296,9 +296,83 @@ public class BasicSteps {
         }
     }
 
-    @When("The application {string} PATCH a point scale, he rename the badge named {string} into {string}")
-    public void theApplicationPATCHAPointScaleHeRenameTheBadgeNamedInto(String applicationReference, String oldName,
-                                                                        String newName) {
+    @When("The application {string} PATCH a badge with the id {int}")
+    public void theApplicationPATCHABadgeWithTheId(String applicationReference, int id) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value("test");
+
+            lastApiResponse = api.patchBadgeWithHttpInfo(id, Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+
+    }
+
+    @When("The application {string} PATCH a badge named {string}, he want to change the attribute {string} with the " +
+            "value {string}")
+    public void theApplicationPATCHABadgeNamedHeWantToChangeTheAttributeWithTheValue(String applicationReference,
+                                                                                     String badgeName,
+                                                                                     String attribute, String value) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<Badge>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<Badge> badges = getBadgeResponse.getData();
+            Badge target = null;
+            for (Badge badge : badges) {
+                if (badge.getName().equals(badgeName)) {
+                    target = badge;
+                    break;
+                }
+            }
+
+            String path = target.getLinks().get(0).getSelf().getPath();
+
+            String id = path.substring(path.lastIndexOf('/') + 1);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/" + attribute)
+                    .value(value);
+
+            lastApiResponse = api.patchBadgeWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} PATCH a point scale with the id {int}")
+    public void theApplicationPATCHAPointScaleWithTheId(String applicationReference, int id) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value("test");
+
+            lastApiResponse = api.patchPointScaleWithHttpInfo(id, Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} PATCH a point scale named {string}, he want to change the attribute {string} with" +
+            " the value {string}")
+    public void theApplicationPATCHAPointScaleNamedHeWantToChangeTheAttributeWithTheValue(String applicationReference,
+                                                                                          String pointScaleName,
+                                                                                          String attribute,
+                                                                                          String value) {
 
         try {
             checkCurrentApplication(applicationReference);
@@ -307,7 +381,7 @@ public class BasicSteps {
             List<PointScale> pointScales = getPointScalesResponse.getData();
             PointScale target = null;
             for (PointScale pointScale : pointScales) {
-                if (pointScale.getName().equals(oldName)) {
+                if (pointScale.getName().equals(pointScaleName)) {
                     target = pointScale;
                     break;
                 }
@@ -319,8 +393,8 @@ public class BasicSteps {
 
             JsonPatchDocument patchDocument = new JsonPatchDocument()
                     .op(JsonPatchDocument.OpEnum.REPLACE)
-                    .path("/name")
-                    .value(newName);
+                    .path("/" + attribute)
+                    .value(value);
 
             lastApiResponse = api.patchPointScaleWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
             processApiResponse(lastApiResponse);
@@ -417,6 +491,5 @@ public class BasicSteps {
             api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
         }
     }
-
 
 }

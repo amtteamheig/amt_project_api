@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.json.JsonException;
 import javax.json.JsonPatch;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
@@ -95,7 +96,7 @@ public class PointScalesApiController implements PointScalesApi {
             PointScaleEntity existingPointScaleEntity =
                     pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                    "Can't found point scale related to this apikey"));
+                                    "Can't the badge point scale in the repository"));
 
             return ResponseEntity.ok(toPointScale(existingPointScaleEntity));
         } catch (URISyntaxException e) {// If the URI is not valid
@@ -105,21 +106,26 @@ public class PointScalesApiController implements PointScalesApi {
 
     @Override
     public ResponseEntity<Void> patchPointScale(Integer id, @Valid List<JsonPatchDocument> jsonPatchDocument) {
-        String apiKeyId = (String) servletRequest.getAttribute("Application");
+        try {
+            String apiKeyId = (String) servletRequest.getAttribute("Application");
 
-        PointScaleEntity existingPointScale =
-                pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED));
+            PointScaleEntity existingPointScale =
+                    pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId, Long.valueOf(id))
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Can't the badge point scale in the repository"));
 
-        // Convert into JsonPatch
-        List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
+            // Convert into JsonPatch
+            List<JsonPatch> jsonPatches = toJsonPatch(jsonPatchDocument);
 
-        for (JsonPatch jsonPatch : jsonPatches) {
-            PointScaleEntity patched = patch(jsonPatch, existingPointScale);
-            // If the entity already exists, save() will update it
-            pointScaleRepository.save(patched);
+            for (JsonPatch jsonPatch : jsonPatches) {
+                PointScaleEntity patched = patch(jsonPatch, existingPointScale);
+                // If the entity already exists, save() will update it
+                pointScaleRepository.save(patched);
+            }
+            return ResponseEntity.ok().build();
+        }catch (JsonException e ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The body is malformed");
         }
-        return ResponseEntity.ok().build();
 
     }
 
@@ -160,7 +166,7 @@ public class PointScalesApiController implements PointScalesApi {
      * @param targetPointScale Where apply this changes
      * @return the patched entity
      */
-    private PointScaleEntity patch(JsonPatch patch, PointScaleEntity targetPointScale) {
+    private PointScaleEntity patch(JsonPatch patch, PointScaleEntity targetPointScale) throws JsonException {
 
         JsonStructure target = objectMapper.convertValue(targetPointScale, JsonStructure.class);
 

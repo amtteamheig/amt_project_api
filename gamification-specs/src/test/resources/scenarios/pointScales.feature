@@ -31,5 +31,16 @@ Feature: Check server is running
     Given The application has a pointScale payload
     When The application "A1" POST the "Platinum Rank" pointScale payload to the /pointScales endpoint
     Then The application receives a 201 status code
-    When The application "A1" PATCH a point scale, he rename the badge named "Platinum Rank" into "Wood Rank"
+    When The application "A1" PATCH a point scale named "Platinum Rank", he want to change the attribute "name" with the value "Wood Rank"
     Then The application receives a 200 status code
+
+  Scenario: update point scale with a incorrect id
+    When The application "A1" PATCH a point scale with the id 99
+    Then The application receives a 404 status code
+
+  Scenario: update a unknown attribute
+    Given The application has a pointScale payload
+    When The application "A1" POST the "Test Rank" pointScale payload to the /pointScales endpoint
+    When The application "A1" PATCH a point scale named "Test Rank", he want to change the attribute "test" with the value "Bla"
+    Then The application receives a 400 status code
+

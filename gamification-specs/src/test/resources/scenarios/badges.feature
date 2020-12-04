@@ -44,3 +44,13 @@ Feature: Validation of badges implementation
     Then The application receives a 201 status code
     When The application "A1" PATCH a badge, he rename the badge named "Platinum" into "Wood"
     Then The application receives a 200 status code
+
+  Scenario: update badge with a incorrect id
+    When The application "A1" PATCH a badge with the id 99
+    Then The application receives a 404 status code
+
+  Scenario: update a unknown attribute
+    Given The application has a badge payload
+    When The application "A1" POST the "Test" badge payload to the /badges endpoint
+    When The application "A1" PATCH a badge named "Test", he want to change the attribute "test" with the value "Bla"
+    Then The application receives a 400 status code
