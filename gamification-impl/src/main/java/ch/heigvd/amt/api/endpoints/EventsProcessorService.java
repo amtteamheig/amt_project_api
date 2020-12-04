@@ -60,7 +60,7 @@ public class EventsProcessorService implements EventsApi {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Optional<UserEntity> userInRep = userRepository.findById(event.getUserId());
+        Optional<UserEntity> userInRep = userRepository.findByApiKeyEntityValue_AndId(apiKeyId, event.getUserId());
         UserEntity user;
 
         //check if user is already in database or not
@@ -73,7 +73,7 @@ public class EventsProcessorService implements EventsApi {
         }
 
         //check rules
-        if(handleRules(event,user)){
+        if(handleRules(event,user,apiKeyId)){
             userRepository.save(user);
         } else {
             return new ResponseEntity("Cannot find Rule with type " + event.getType(), HttpStatus.NOT_FOUND);
@@ -88,12 +88,12 @@ public class EventsProcessorService implements EventsApi {
      * @param user current user
      * @return true if a rule with event type was found
      */
-    private boolean handleRules(Event event, UserEntity user){
+    private boolean handleRules(Event event, UserEntity user, String apiKeyId){
 
         //TODO : Change reason for something else than the type of the rule
         //TODO : Check if badge and pointScale exists
 
-        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_Type(event.getType());
+        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(event.getType(),apiKeyId);
 
         //if no rules found with given type, return
         if(ruleInRep.isEmpty()){
