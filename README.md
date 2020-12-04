@@ -1,47 +1,31 @@
-# TrainingREST
+# AMT - Gamification API Project
 
-# Build and run the Fruit microservice
+## Introduction
+In this project we will create an API to enable any client to add a gamification value to their service. 
 
-You can use maven to build and run the REST API implementation from the command line. After invoking the following maven goal, the Spring Boot server will be up and running, listening for connections on port 8080.
+## Gamification Features
+A client will be able to : 
 
-```
-cd fruits-impl/
-mvn spring-boot:run
-```
+### Create Rules
+..
 
-You can then access:
+### Create Point Scales
+Point scales enables our clients to put a name on their gamification entities.
 
-* the [API documentation](http://localhost:8080/swagger-ui.html), generated from annotations in the code
-* the [API endpoint](http://localhost:8080/), accepting GET and POST requests
+*Example :*
 
-You can use curl to invoke the endpoints:
+*1) The StackOverflow Website created a new point scale "Reputation" to enable users to have a Reputation and get recognized within the StackOverflow community*
 
-* To retrieve the list of fruits previously created:
+*2) A Library Website added the point scale "BookWorm" which enables users to see how many books they have read*
 
-```
-curl -X GET --header 'Accept: application/json' 'http://localhost:8080/fruits'
-```
+#### Point Scale Endpoint
 
-* To create a new fruit (beware that in the live documentation, there are extra \ line separators in the JSON payload that cause issues in some shells)
+* [Create a point scale](docs/pointScale.md) : `POST /pointScales`
+* [Get all created point scales](docs/pointScale.md) : `GET /pointScales`
 
-```
-curl -X POST --header 'Content-Type: application/json' --header 'Accept: */*' -d '{
-  "colour": "red",
-  "expirationDate": "2020-11-06",
-  "expirationDateTime": "2020-11-06T05:43:27.909Z",
-  "kind": "apple",
-  "size": "small",
-  "weight": "light"
-}' 'http://localhost:8080/fruits'
-```
+### Create Badges 
 
-# Test the Fruit microservice by running the executable specification
+The client will be able to create badges. A badge can be rewarded to their users.
 
-You can use the Cucumber project to validate the API implementation. Do this when the server is running.
-
-```
-cd cd fruits-specs/
-mvn clean test
-```
-You will see the test results in the console, but you can also open the file located in `./target/cucumber`
-
+* Create point scales = 
+* Create rules
