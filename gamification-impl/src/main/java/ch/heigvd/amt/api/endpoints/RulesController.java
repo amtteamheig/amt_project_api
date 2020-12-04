@@ -51,6 +51,12 @@ public class RulesController implements RulesApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        //check if rule with this type already exists
+        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(rule.getIf().getType(),apiKeyId);
+        if(ruleInRep.isPresent()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Rule with given type already exists");
+        }
+
         RuleEntity newRuleEntity = toRuleEntity(rule);
         newRuleEntity.setApiKeyEntity(apiKey);
         ruleRepository.save(newRuleEntity);

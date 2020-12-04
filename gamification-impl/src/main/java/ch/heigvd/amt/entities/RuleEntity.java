@@ -38,6 +38,9 @@ public class RuleEntity {
     @Builder
     public static class If {
         @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private long id;
+
         private String type;
     }
 
