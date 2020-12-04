@@ -12,6 +12,25 @@ Before you get to play with the gamification engine, you need to register your a
 
 * [Register](docs/register.md) : `POST /registration`
 
+### Users
+To be able to distinguish statistics with more than one users we need to have users in our database. Those users will be automatically generated from events.
+
+#### Users Endpoints
+
+* [Get a specific user](docs/users_get_id.md) : `GET /users/{id}`
+* [Get all users](docs/users_get.md) : `GET /users`
+
+### Events
+In order to link user events with our rules, we have the events endpoint.
+
+*Example :*
+
+*1) User liked a picture, tell the API this user liked a picture ! Does it validates any rules ? Yes. He liked 10 pictures so he gets the badge "Picture Lover" !*
+
+#### Rules Endpoints
+
+* [Indicate an event to the API](docs/events_post.md) : `POST /events`
+
 ### Create Rules
 A rule will enable the application to determine how the user will be able to profit from the gamification engine.
 
