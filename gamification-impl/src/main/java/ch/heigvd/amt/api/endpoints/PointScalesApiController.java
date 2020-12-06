@@ -33,6 +33,12 @@ public class PointScalesApiController implements PointScalesApi {
     @Autowired
     ServletRequest servletRequest;
 
+    /**
+     * Servlet entry point POST /pointScales
+     * @param pointScale (optional) pointScale object built by user
+     * @return response
+     */
+    @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createPointScale(@Valid PointScale pointScale) {
         String apiKeyId = (String) servletRequest.getAttribute("Application");
@@ -51,14 +57,16 @@ public class PointScalesApiController implements PointScalesApi {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Servlet entry point GET /pointScales
+     * @return response
+     */
     @Override
     public ResponseEntity<List<PointScale>> getPointScales() {
 
         String apiKeyId = (String) servletRequest.getAttribute("Application");
-
         Optional<List<PointScaleEntity>> pointScalesEntries =
                 pointScaleRepository.findByApiKeyEntityValue(apiKeyId);
-
         List<PointScale> pointScales = new ArrayList<>();
 
         if (pointScalesEntries.isPresent()) {
@@ -69,7 +77,11 @@ public class PointScalesApiController implements PointScalesApi {
         return ResponseEntity.ok(pointScales);
     }
 
-
+    /**
+     * Servlet entry point GET /pointScale/id
+     * @param id pointScale's id
+     * @return response
+     */
     @Override
     public ResponseEntity<PointScale> getPointScale(Integer id) {
 
@@ -82,6 +94,11 @@ public class PointScalesApiController implements PointScalesApi {
         return ResponseEntity.ok(toPointScale(existingPointScaleEntity));
     }
 
+    /**
+     * convert pointScale to pointScaleEntity
+     * @param pointScale pointScale
+     * @return pointScaleEntity
+     */
     private PointScaleEntity toPointScaleEntity(PointScale pointScale) {
         PointScaleEntity entity = new PointScaleEntity();
         entity.setName(pointScale.getName());
@@ -89,6 +106,11 @@ public class PointScalesApiController implements PointScalesApi {
         return entity;
     }
 
+    /**
+     * convert pointScaleEntity to pointScale
+     * @param entity pointScaleEntity
+     * @return pointScale
+     */
     private PointScale toPointScale(PointScaleEntity entity) {
         PointScale pointScale = new PointScale();
         pointScale.setName(entity.getName());

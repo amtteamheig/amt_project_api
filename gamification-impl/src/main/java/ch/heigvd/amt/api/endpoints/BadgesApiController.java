@@ -33,6 +33,12 @@ public class BadgesApiController implements BadgesApi {
     @Autowired
     ServletRequest servletRequest;
 
+    /**
+     * Servlet entry point POST /badges
+     * @param badge (optional) badge object built by user
+     * @return response
+     */
+    @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createBadge(@Valid Badge badge) {
 
@@ -52,12 +58,15 @@ public class BadgesApiController implements BadgesApi {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Servlet entry point GET /badges
+     * @return response
+     */
     @Override
     public ResponseEntity<List<Badge>> getBadges() {
+
         String apiKeyId = (String) servletRequest.getAttribute("Application");
-
         Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(apiKeyId);
-
         List<Badge> badges = new ArrayList<>();
 
         if (badgeEntities.isPresent()) {
@@ -69,6 +78,11 @@ public class BadgesApiController implements BadgesApi {
         return ResponseEntity.ok(badges);
     }
 
+    /**
+     * Servlet entry point GET /badge/id
+     * @param id badge id
+     * @return response
+     */
     @Override
     public ResponseEntity<Badge> getBadge(Integer id) {
         String apiKeyId = (String) servletRequest.getAttribute("Application");
