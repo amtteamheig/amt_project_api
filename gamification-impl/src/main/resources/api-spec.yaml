@@ -54,6 +54,8 @@ paths:
                 $ref: '#/components/schemas/Badge'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: not found
   /pointScales:
     post:
       description: create a pointScale
@@ -101,6 +103,8 @@ paths:
                 $ref: '#/components/schemas/PointScale'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: not found
   /registration:
     post:
       description: registrate application
@@ -140,6 +144,8 @@ paths:
           description: created
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: conflict with existing rule
     get:
       description: get the list of rules
       operationId: getRules
@@ -173,6 +179,8 @@ paths:
                 $ref: '#/components/schemas/Rule'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: not found
   /users:
     get:
       description: get the list of users
@@ -207,7 +215,8 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
+        '404':
+          description: not found
 
 components:
   securitySchemes:

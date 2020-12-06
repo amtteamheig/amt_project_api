@@ -269,7 +269,7 @@ public class BasicSteps {
                 .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
         try {
             checkCurrentApplication(applicationReference);
-            lastApiResponse = api.getPointScaleWithHttpInfo(id);
+            lastApiResponse = api.getRuleWithHttpInfo(id);
             processApiResponse(lastApiResponse);
             lastReceivedRule = (Rule) lastApiResponse.getData();
         } catch (ApiException e) {

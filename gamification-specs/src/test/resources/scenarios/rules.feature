@@ -19,10 +19,10 @@ Feature: Validation of rules implementation
   #
   # Create a rule (POST / GET with user property check)
   #
-  #Scenario: 2 applications retrieve only their rules
-   # Given The application has a rule payload
-  #  When The application "A1" POST the "rule1" rule payload to the /rules endpoint
-  #  And The application "A1" POST the "rule2" rule payload to the /rules endpoint
-   # And  The application "A2" POST the "rule3" rule payload to the /rules endpoint
-   # Then The application "A1" GET to the /rules endpoint receive a list containing 2 rule(s)
-   # And The application "A2" GET to the /rules endpoint receive a list containing 1 rule(s)
+  Scenario: 2 applications retrieve only their rules
+    Given The application has a rule payload
+    When The application "A1" POST the "rule1" rule payload to the /rules endpoint
+    And The application "A1" POST the "rule2" rule payload to the /rules endpoint
+    And  The application "A2" POST the "rule3" rule payload to the /rules endpoint
+    Then The application "A1" GET to the /rules endpoint receive a list containing 2 rule(s)
+    And The application "A2" GET to the /rules endpoint receive a list containing 1 rule(s)
