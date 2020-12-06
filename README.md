@@ -1,47 +1,74 @@
-# TrainingREST
+# AMT - Gamification API Project
 
-# Build and run the Fruit microservice
+## Introduction
+In this project we will create an API to enable any client to add a gamification value to their service. 
 
-You can use maven to build and run the REST API implementation from the command line. After invoking the following maven goal, the Spring Boot server will be up and running, listening for connections on port 8080.
+## Gamification Features
 
-```
-cd fruits-impl/
-mvn spring-boot:run
-```
+### Registration
+Before you get to play with the gamification engine, you need to register your application into our database so we can distinguish which application is being used. Doing so will give you a key that will be required in the header of your requests for all endpoints.
 
-You can then access:
+#### Registration Endpoint
 
-* the [API documentation](http://localhost:8080/swagger-ui.html), generated from annotations in the code
-* the [API endpoint](http://localhost:8080/), accepting GET and POST requests
+* [Register](docs/register.md) : `POST /registration`
 
-You can use curl to invoke the endpoints:
+### Users
+To be able to distinguish statistics with more than one users we need to have users in our database. Those users will be automatically generated from events.
 
-* To retrieve the list of fruits previously created:
+#### Users Endpoints
 
-```
-curl -X GET --header 'Accept: application/json' 'http://localhost:8080/fruits'
-```
+* [Get a specific user](docs/users_get_id.md) : `GET /users/{id}`
+* [Get all users](docs/users_get.md) : `GET /users`
 
-* To create a new fruit (beware that in the live documentation, there are extra \ line separators in the JSON payload that cause issues in some shells)
+### Events
+In order to link user events with our rules, we have the events endpoint.
 
-```
-curl -X POST --header 'Content-Type: application/json' --header 'Accept: */*' -d '{
-  "colour": "red",
-  "expirationDate": "2020-11-06",
-  "expirationDateTime": "2020-11-06T05:43:27.909Z",
-  "kind": "apple",
-  "size": "small",
-  "weight": "light"
-}' 'http://localhost:8080/fruits'
-```
+*Example :*
 
-# Test the Fruit microservice by running the executable specification
+*1) User liked a picture, tell the API this user liked a picture ! Does it validates any rules ? Yes. He liked 10 pictures so he gets the badge "Picture Lover" !*
 
-You can use the Cucumber project to validate the API implementation. Do this when the server is running.
+#### Rules Endpoints
 
-```
-cd cd fruits-specs/
-mvn clean test
-```
-You will see the test results in the console, but you can also open the file located in `./target/cucumber`
+* [Indicate an event to the API](docs/events_post.md) : `POST /events`
 
+### Create Rules
+A rule will enable the application to determine how the user will be able to profit from the gamification engine.
+
+*Example :*
+
+*1) Facebook added a gamification service that gives you 1 point on every comment !*
+
+#### Rules Endpoints
+
+* [Create a rule](docs/rules_post.md) : `POST /rules`
+* [Get a specific rule](docs/rules_get_id.md) : `GET /rules/{id}`
+* [Get all rules](docs/rules_get.md) : `GET /rules`
+
+### Create Point Scales
+Point scales enables our clients to put a name on their gamification entities.
+
+*Examples :*
+
+*1) The StackOverflow Website created a new point scale "Reputation" to enable users to have a Reputation and get recognized within the StackOverflow community*
+
+*2) A Library Website added the point scale "BookWorm" which enables users to see how many books they have read*
+
+#### Point Scale Endpoints
+
+* [Create a point scale](docs/pointScale_post.md) : `POST /pointScales`
+* [Get a specific point scale](docs/pointScales_get_id.md) : `GET /pointScales/{id}`
+* [Get all created point scales](docs/pointScale_get.md) : `GET /pointScales`
+
+### Create Badges 
+
+The client will be able to create badges. A badge can be rewarded to their users as a specific accomplishement defined by a rule.
+
+*Example :*
+
+*1) I upvoted 1'000 posts, I received the badge "Go Outside!"*
+
+#### Badges Endpoints
+
+* [Create a badge](docs/badges_post.md) : `POST /badges`
+* [Get a specific badge](docs/badges_get_id.md) : `GET /badges/{id}`
+* [Get all badges](docs/badges_get.md) : `GET /badges`
