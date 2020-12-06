@@ -26,3 +26,12 @@ Feature: Validation of rules implementation
     And  The application "A2" POST the "rule3" rule payload to the /rules endpoint
     Then The application "A1" GET to the /rules endpoint receive a list containing 2 rule(s)
     And The application "A2" GET to the /rules endpoint receive a list containing 1 rule(s)
+
+  Scenario: check duplicates : the same app cannot define 2 times the same rule
+    Given The application has a rule payload
+    When The application "A1" POST the "rule4" rule payload to the /rules endpoint
+    Then The application receives a 201 status code
+    When The application "A1" POST the "rule4" rule payload to the /rules endpoint
+    Then The application receives a 409 status code
+    When The application "A2" POST the "rule4" rule payload to the /rules endpoint
+    Then The application receives a 201 status code
