@@ -48,6 +48,12 @@ public class PointScalesApiController implements PointScalesApi {
     @Autowired
     ObjectMapper objectMapper;
 
+    /**
+     * Servlet entry point POST /pointScales
+     * @param pointScale (optional) pointScale object built by user
+     * @return response
+     */
+    @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createPointScale(@Valid PointScale pointScale) {
         String apiKeyId = (String) servletRequest.getAttribute("Application");
@@ -66,6 +72,10 @@ public class PointScalesApiController implements PointScalesApi {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Servlet entry point GET /pointScales
+     * @return response
+     */
     @Override
     public ResponseEntity<List<PointScaleResponse>> getPointScales() {
         try {
@@ -88,7 +98,11 @@ public class PointScalesApiController implements PointScalesApi {
         }
     }
 
-
+    /**
+     * Servlet entry point GET /pointScale/id
+     * @param id pointScale's id
+     * @return response
+     */
     @Override
     public ResponseEntity<PointScaleResponse> getPointScale(Integer id) {
         try {
@@ -131,10 +145,9 @@ public class PointScalesApiController implements PointScalesApi {
     }
 
     /**
-     * Converts a point scale to a point scale entity
-     *
-     * @param pointScale point scale
-     * @return point scale entity
+     * convert pointScale to pointScaleEntity
+     * @param pointScale pointScale
+     * @return pointScaleEntity
      */
     private PointScaleEntity toPointScaleEntity(PointScale pointScale) {
         PointScaleEntity entity = new PointScaleEntity();
@@ -144,10 +157,9 @@ public class PointScalesApiController implements PointScalesApi {
     }
 
     /**
-     * Converts a point scale entity to a point scale
-     *
-     * @param entity badge entity
-     * @return point scale
+     * convert pointScaleEntity to pointScale
+     * @param entity pointScaleEntity
+     * @return pointScale
      */
     private PointScale toPointScale(PointScaleEntity entity) {
         PointScale pointScale = new PointScale();

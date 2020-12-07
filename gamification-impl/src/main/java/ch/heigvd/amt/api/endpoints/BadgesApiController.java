@@ -41,6 +41,12 @@ public class BadgesApiController implements BadgesApi {
     @Autowired
     ObjectMapper objectMapper;
 
+    /**
+     * Servlet entry point POST /badges
+     * @param badge (optional) badge object built by user
+     * @return response
+     */
+    @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createBadge(@Valid Badge badge) {
 
@@ -60,6 +66,10 @@ public class BadgesApiController implements BadgesApi {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Servlet entry point GET /badges
+     * @return response
+     */
     @Override
     public ResponseEntity<List<BadgeResponse>> getBadges() {
         try {
@@ -97,7 +107,11 @@ public class BadgesApiController implements BadgesApi {
         }
     }
 
-
+    /**
+     * Servlet entry point GET /badge/id
+     * @param id badge id
+     * @return response
+     */
     @Override
     public ResponseEntity<Void> patchBadge(Integer id, @Valid List<JsonPatchDocument> jsonPatchDocument) {
         try {
