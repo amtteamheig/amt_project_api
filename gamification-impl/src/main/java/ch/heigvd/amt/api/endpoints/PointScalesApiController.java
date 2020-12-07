@@ -168,6 +168,12 @@ public class PointScalesApiController implements PointScalesApi {
         return pointScale;
     }
 
+    /**
+     * convert pointScaleEntity to pointScaleResponse
+     * @param entity pointScaleEntity
+     * @return pointScale response
+     * @throws URISyntaxException
+     */
     private PointScaleResponse toPointScaleResponse(PointScaleEntity entity) throws URISyntaxException {
         PointScaleResponse pointScaleResponse = new PointScaleResponse();
         pointScaleResponse.setName(entity.getName());
