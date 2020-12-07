@@ -1,6 +1,7 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.BadgesApi;
+import ch.heigvd.amt.api.model.BadgeResponse;
 import ch.heigvd.amt.api.model.JsonPatchDocument;
 import ch.heigvd.amt.api.model.Link;
 import ch.heigvd.amt.entities.ApiKeyEntity;
@@ -60,17 +61,17 @@ public class BadgesApiController implements BadgesApi {
     }
 
     @Override
-    public ResponseEntity<List<Badge>> getBadges() {
+    public ResponseEntity<List<BadgeResponse>> getBadges() {
         try {
             String apiKeyId = (String) servletRequest.getAttribute("Application");
 
             Optional<List<BadgeEntity>> badgeEntities = badgeRepository.findByApiKeyEntityValue(apiKeyId);
 
-            List<Badge> badges = new ArrayList<>();
+            List<BadgeResponse> badges = new ArrayList<>();
 
             if (badgeEntities.isPresent()) {
                 for (BadgeEntity badgeEntity : badgeEntities.get()) {
-                    badges.add(toBadge(badgeEntity));
+                    badges.add(toBadgeResponse(badgeEntity));
                 }
             }
 
@@ -81,7 +82,7 @@ public class BadgesApiController implements BadgesApi {
     }
 
     @Override
-    public ResponseEntity<Badge> getBadge(Integer id) {
+    public ResponseEntity<BadgeResponse> getBadge(Integer id) {
         try {
             String apiKeyId = (String) servletRequest.getAttribute("Application");
 
@@ -90,7 +91,7 @@ public class BadgesApiController implements BadgesApi {
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                     "Can't the badge entity in the repository"));
 
-            return ResponseEntity.ok(toBadge(existingBadgeEntity));
+            return ResponseEntity.ok(toBadgeResponse(existingBadgeEntity));
         } catch (URISyntaxException e) { // If the URI is not valid
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't create the link URI");
         }
@@ -142,17 +143,31 @@ public class BadgesApiController implements BadgesApi {
      *
      * @param entity : badge entity
      * @return badge
-     * @throws URISyntaxException
      */
-    private Badge toBadge(BadgeEntity entity) throws URISyntaxException {
+    private Badge toBadge(BadgeEntity entity) {
         Badge badge = new Badge();
         badge.setName(entity.getName());
         badge.setObtainedDate(entity.getObtainedDate());
         badge.setImageUrl(entity.getImageUrl());
+        return badge;
+    }
+
+    /**
+     * Converts a badge entity to a badge response with links
+     *
+     * @param entity : badge entity
+     * @return badge response
+     * @throws URISyntaxException
+     */
+    private BadgeResponse toBadgeResponse(BadgeEntity entity) throws URISyntaxException {
+        BadgeResponse badgeResponse = new BadgeResponse();
+        badgeResponse.setName(entity.getName());
+        badgeResponse.setObtainedDate(entity.getObtainedDate());
+        badgeResponse.setImageUrl(entity.getImageUrl());
         Link self = new Link();
         self.self(new URI(servletRequest.getLocalAddr() + "/badges/" + entity.getId()));
-        badge.setLinks(Collections.singletonList(self));
-        return badge;
+        badgeResponse.setLinks(Collections.singletonList(self));
+        return badgeResponse;
     }
 
     /**

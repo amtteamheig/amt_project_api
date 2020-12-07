@@ -43,8 +43,8 @@ public class BasicSteps {
     private ApiKey apiKey;
     private String lastReceivedLocationHeader;
 
-    private Badge lastReceivedBadge;
-    private PointScale lastReceivedPointScale;
+    private BadgeResponse lastReceivedBadge;
+    private PointScaleResponse lastReceivedPointScale;
     private User lastReceivedUser;
 
     // Keep track of the application created during the scenarios execution
@@ -91,8 +91,8 @@ public class BasicSteps {
         try {
             checkCurrentApplication(applicationReference);
 
-            ApiResponse<List<Badge>> getBadgeResponse = api.getBadgesWithHttpInfo();
-            List<Badge> badges = getBadgeResponse.getData();
+            ApiResponse<List<BadgeResponse>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<BadgeResponse> badges = getBadgeResponse.getData();
 
             assertThat(badges, contains(
                     hasProperty(attribute, is(value))
@@ -110,8 +110,8 @@ public class BasicSteps {
         try {
             checkCurrentApplication(applicationReference);
 
-            ApiResponse<List<PointScale>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
-            List<PointScale> pointScales = getPointScalesResponse.getData();
+            ApiResponse<List<PointScaleResponse>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScaleResponse> pointScales = getPointScalesResponse.getData();
 
             assertThat(pointScales, contains(
                     hasProperty(attribute, is(value))
@@ -236,7 +236,7 @@ public class BasicSteps {
             checkCurrentApplication(applicationReference);
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
-            lastReceivedBadge = (Badge) lastApiResponse.getData();
+            lastReceivedBadge = (BadgeResponse) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
@@ -272,7 +272,7 @@ public class BasicSteps {
             checkCurrentApplication(applicationReference);
             lastApiResponse = api.getPointScaleWithHttpInfo(id);
             processApiResponse(lastApiResponse);
-            lastReceivedPointScale = (PointScale) lastApiResponse.getData();
+            lastReceivedPointScale = (PointScaleResponse) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
@@ -332,10 +332,10 @@ public class BasicSteps {
         try {
             checkCurrentApplication(applicationReference);
 
-            ApiResponse<List<Badge>> getBadgeResponse = api.getBadgesWithHttpInfo();
-            List<Badge> badges = getBadgeResponse.getData();
-            Badge target = null;
-            for (Badge badge : badges) {
+            ApiResponse<List<BadgeResponse>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<BadgeResponse> badges = getBadgeResponse.getData();
+            BadgeResponse target = null;
+            for (BadgeResponse badge : badges) {
                 if (badge.getName().equals(badgeName)) {
                     target = badge;
                     break;
@@ -386,10 +386,10 @@ public class BasicSteps {
         try {
             checkCurrentApplication(applicationReference);
 
-            ApiResponse<List<PointScale>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
-            List<PointScale> pointScales = getPointScalesResponse.getData();
-            PointScale target = null;
-            for (PointScale pointScale : pointScales) {
+            ApiResponse<List<PointScaleResponse>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScaleResponse> pointScales = getPointScalesResponse.getData();
+            PointScaleResponse target = null;
+            for (PointScaleResponse pointScale : pointScales) {
                 if (pointScale.getName().equals(pointScaleName)) {
                     target = pointScale;
                     break;
@@ -449,7 +449,7 @@ public class BasicSteps {
 
         try {
             checkCurrentApplication(applicationReference);
-            List<Badge> badges = api.getBadges();
+            List<BadgeResponse> badges = api.getBadges();
             assertEquals(size, badges.size());
         } catch (ApiException e) {
             processApiException(e);
@@ -461,7 +461,7 @@ public class BasicSteps {
 
         try {
             checkCurrentApplication(applicationReference);
-            List<PointScale> pointScales = api.getPointScales();
+            List<PointScaleResponse> pointScales = api.getPointScales();
             assertEquals(pointScales.size(), size);
         } catch (ApiException e) {
             processApiException(e);

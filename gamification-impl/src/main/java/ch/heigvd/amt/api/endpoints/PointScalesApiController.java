@@ -3,6 +3,7 @@ package ch.heigvd.amt.api.endpoints;
 import ch.heigvd.amt.api.PointScalesApi;
 import ch.heigvd.amt.api.model.JsonPatchDocument;
 import ch.heigvd.amt.api.model.Link;
+import ch.heigvd.amt.api.model.PointScaleResponse;
 import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.PointScaleEntity;
 import ch.heigvd.amt.api.model.PointScale;
@@ -66,18 +67,18 @@ public class PointScalesApiController implements PointScalesApi {
     }
 
     @Override
-    public ResponseEntity<List<PointScale>> getPointScales() {
+    public ResponseEntity<List<PointScaleResponse>> getPointScales() {
         try {
             String apiKeyId = (String) servletRequest.getAttribute("Application");
 
             Optional<List<PointScaleEntity>> pointScalesEntries =
                     pointScaleRepository.findByApiKeyEntityValue(apiKeyId);
 
-            List<PointScale> pointScales = new ArrayList<>();
+            List<PointScaleResponse> pointScales = new ArrayList<>();
 
             if (pointScalesEntries.isPresent()) {
                 for (PointScaleEntity pointScaleEntity : pointScalesEntries.get()) {
-                    pointScales.add(toPointScale(pointScaleEntity));
+                    pointScales.add(toPointScaleResponse(pointScaleEntity));
                 }
             }
 
@@ -89,7 +90,7 @@ public class PointScalesApiController implements PointScalesApi {
 
 
     @Override
-    public ResponseEntity<PointScale> getPointScale(Integer id) {
+    public ResponseEntity<PointScaleResponse> getPointScale(Integer id) {
         try {
             String apiKeyId = (String) servletRequest.getAttribute("Application");
 
@@ -98,7 +99,7 @@ public class PointScalesApiController implements PointScalesApi {
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                     "Can't the badge point scale in the repository"));
 
-            return ResponseEntity.ok(toPointScale(existingPointScaleEntity));
+            return ResponseEntity.ok(toPointScaleResponse(existingPointScaleEntity));
         } catch (URISyntaxException e) {// If the URI is not valid
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't create the link URI");
         }
@@ -147,16 +148,22 @@ public class PointScalesApiController implements PointScalesApi {
      *
      * @param entity badge entity
      * @return point scale
-     * @throws URISyntaxException
      */
-    private PointScale toPointScale(PointScaleEntity entity) throws URISyntaxException {
+    private PointScale toPointScale(PointScaleEntity entity) {
         PointScale pointScale = new PointScale();
         pointScale.setName(entity.getName());
         pointScale.setDescription(entity.getDescription());
+        return pointScale;
+    }
+
+    private PointScaleResponse toPointScaleResponse(PointScaleEntity entity) throws URISyntaxException {
+        PointScaleResponse pointScaleResponse = new PointScaleResponse();
+        pointScaleResponse.setName(entity.getName());
+        pointScaleResponse.setDescription(entity.getDescription());
         Link self = new Link();
         self.self(new URI(servletRequest.getLocalAddr() + "/pointScales/" + entity.getId()));
-        pointScale.setLinks(Collections.singletonList(self));
-        return pointScale;
+        pointScaleResponse.setLinks(Collections.singletonList(self));
+        return pointScaleResponse;
     }
 
     /**

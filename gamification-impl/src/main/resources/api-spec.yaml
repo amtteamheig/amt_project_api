@@ -32,7 +32,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Badge'
+                  $ref: '#/components/schemas/BadgeResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /badges/{id}:
@@ -52,7 +52,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Badge'
+                $ref: '#/components/schemas/BadgeResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     patch:
@@ -103,7 +103,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PointScale'
+                  $ref: '#/components/schemas/PointScaleResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /pointScales/{id}:
@@ -122,7 +122,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/PointScale'
+                $ref: '#/components/schemas/PointScaleResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     patch:
@@ -278,7 +278,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: ' '#/components/schemas/PatchBody'
+            $ref: '#/components/schemas/PatchBody'
   schemas:
     PointScale:
       type: object
@@ -287,10 +287,15 @@ components:
           type: string
         description:
           type: string
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Link'
+    PointScaleResponse:
+      allOf:
+        - $ref: '#/components/schemas/PointScale'
+        - type: object
+          properties:
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/Link'
     Badge:
       type: object
       properties:
@@ -302,10 +307,15 @@ components:
         imageUrl:
           type: string
           nullable: true
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Link'
+    BadgeResponse:
+      allOf:
+        - $ref: '#/components/schemas/Badge'
+        - type: object
+          properties:
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/Link'
     Event:
       type: object
       properties:
