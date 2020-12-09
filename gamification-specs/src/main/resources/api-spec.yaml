@@ -4,8 +4,35 @@ info:
   title: Gamification API
   description: API of our gamification
 security:
-  #  - bearerAuth: []
   - apiKeyAuth: []
+errors:
+  badges:
+    NameIsEmpty:
+      description: Name is empty
+    ObtainedDateIsEmpty:
+      description: ObtainedDate is empty
+  pointScales:
+    NameIsEmpty:
+      description: Name is empty
+    DescriptionIsEmpty:
+      description: Description is empty
+  events:
+    UserIdIsEmpty:
+      description: UserID is empty
+    TimestampIsEmpty:
+      description: TimeStamp is empty
+    TypeIsEmpty:
+      description: Type is empty
+  rules:
+    if:
+      TypeIsEmpty:
+        description: Type of If is empty
+    then:
+      AwardBadgeIsEmpty:
+        description: AwardBadge of Then is empty
+      awardPoints:
+        PointScaleIsEmpty:
+          description: PointScale of AwardPoints of Then is empty
 paths:
   /badges:
     post:
@@ -19,6 +46,19 @@ paths:
       responses:
         '201':
           description: created
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/errors/badges/NameIsEmpty'
+                  - $ref: '#/errors/badges/ObtainedDateIsEmpty'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    $ref: '#/errors/badges/NameIsEmpty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -54,6 +94,8 @@ paths:
                 $ref: '#/components/schemas/Badge'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
   /pointScales:
     post:
       description: create a pointScale
@@ -66,6 +108,19 @@ paths:
       responses:
         '201':
           description: created
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/errors/pointScales/NameIsEmpty'
+                  - $ref: '#/errors/pointScales/DescriptionIsEmpty'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    $ref: '#/errors/pointScales/NameIsEmpty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -124,6 +179,20 @@ paths:
       responses:
         '200':
           description: success
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/errors/events/UserIdIsEmpty'
+                  - $ref: '#/errors/events/TimestampIsEmpty'
+                  - $ref: '#/errors/events/TypeIsEmpty'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    $ref: '#/errors/events/UserIdIsEmpty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /rules:
@@ -138,6 +207,20 @@ paths:
       responses:
         '201':
           description: created
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/errors/rules/if/TypeIsEmpty'
+                  - $ref: '#/errors/rules/then/AwardBadgeIsEmpty'
+                  - $ref: '#/errors/rules/then/awardPoints/PointScaleIsEmpty'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    $ref: '#/errors/rules/if/TypeIsEmpty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -173,6 +256,8 @@ paths:
                 $ref: '#/components/schemas/Rule'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
   /users:
     get:
       description: get the list of users
@@ -207,6 +292,8 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
 
 
 components:
@@ -226,6 +313,8 @@ components:
         WWW_Authenticate:
           schema:
             type: string
+    NotFoundError:
+      description: entity not found
   schemas:
     PointScale:
       type: object
