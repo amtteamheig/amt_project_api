@@ -5,34 +5,6 @@ info:
   description: API of our gamification
 security:
   - apiKeyAuth: []
-errors:
-  badges:
-    NameIsEmpty:
-      description: Name is empty
-    ObtainedDateIsEmpty:
-      description: ObtainedDate is empty
-  pointScales:
-    NameIsEmpty:
-      description: Name is empty
-    DescriptionIsEmpty:
-      description: Description is empty
-  events:
-    UserIdIsEmpty:
-      description: UserID is empty
-    TimestampIsEmpty:
-      description: TimeStamp is empty
-    TypeIsEmpty:
-      description: Type is empty
-  rules:
-    if:
-      TypeIsEmpty:
-        description: Type of If is empty
-    then:
-      AwardBadgeIsEmpty:
-        description: AwardBadge of Then is empty
-      awardPoints:
-        PointScaleIsEmpty:
-          description: PointScale of AwardPoints of Then is empty
 paths:
   /badges:
     post:
@@ -51,14 +23,12 @@ paths:
           content:
             'application/json':
               schema:
-                oneOf:
-                  - $ref: '#/errors/badges/NameIsEmpty'
-                  - $ref: '#/errors/badges/ObtainedDateIsEmpty'
+                $ref: '#/components/schemas/Error'
               examples:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    $ref: '#/errors/badges/NameIsEmpty'
+                    description: 'Name is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -113,14 +83,12 @@ paths:
           content:
             'application/json':
               schema:
-                oneOf:
-                  - $ref: '#/errors/pointScales/NameIsEmpty'
-                  - $ref: '#/errors/pointScales/DescriptionIsEmpty'
+                $ref: '#/components/schemas/Error'
               examples:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    $ref: '#/errors/pointScales/NameIsEmpty'
+                    description: 'Name is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -184,15 +152,12 @@ paths:
           content:
             'application/json':
               schema:
-                oneOf:
-                  - $ref: '#/errors/events/UserIdIsEmpty'
-                  - $ref: '#/errors/events/TimestampIsEmpty'
-                  - $ref: '#/errors/events/TypeIsEmpty'
+                $ref: '#/components/schemas/Error'
               examples:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    $ref: '#/errors/events/UserIdIsEmpty'
+                    description: 'UserId is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /rules:
@@ -212,15 +177,12 @@ paths:
           content:
             'application/json':
               schema:
-                oneOf:
-                  - $ref: '#/errors/rules/if/TypeIsEmpty'
-                  - $ref: '#/errors/rules/then/AwardBadgeIsEmpty'
-                  - $ref: '#/errors/rules/then/awardPoints/PointScaleIsEmpty'
+                $ref: '#/components/schemas/Error'
               examples:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    $ref: '#/errors/rules/if/TypeIsEmpty'
+                    description: 'Type is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -322,6 +284,11 @@ components:
         name:
           type: string
         description:
+          type: string
+    Error:
+      type: object
+      properties:
+        msg:
           type: string
     Badge:
       type: object
