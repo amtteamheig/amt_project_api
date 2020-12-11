@@ -26,3 +26,12 @@ Feature: Check server is running
     And The application "A2" POST the "Bronze Rank" pointScale payload to the /pointScales endpoint
     Then The application "A1" GET to the /pointScales endpoint receive a list containing 2 pointScale(s)
     And The application "A2" GET to the /pointScales endpoint receive a list containing 1 pointScale(s)
+
+  #
+  # Create a point scale (POST) with bad attributes
+  Scenario: the API should return a 400 status code when the attributes are incorrect
+    Given The application has a pointScale payload
+    When The application "A1" POST the "" pointScale payload to the /pointScales endpoint
+    Then The application receives a 400 status code
+    And The application "A1" POST the "" description pointScale payload to the /pointScales endpoint
+    Then The application receives a 400 status code

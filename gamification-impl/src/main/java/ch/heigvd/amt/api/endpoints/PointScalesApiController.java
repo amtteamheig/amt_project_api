@@ -1,6 +1,7 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.PointScalesApi;
+import ch.heigvd.amt.api.exceptions.ApiException;
 import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.PointScaleEntity;
 import ch.heigvd.amt.api.model.PointScale;
@@ -46,15 +47,19 @@ public class PointScalesApiController implements PointScalesApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
-        newPointScaleEntity.setApiKeyEntity(apiKey);
-        pointScaleRepository.save(newPointScaleEntity);
+        try {
+            PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
+            newPointScaleEntity.setApiKeyEntity(apiKey);
+            pointScaleRepository.save(newPointScaleEntity);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(newPointScaleEntity.getId()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(newPointScaleEntity.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+            return ResponseEntity.created(location).build();
+        } catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        }
     }
 
     /**
@@ -99,8 +104,17 @@ public class PointScalesApiController implements PointScalesApi {
      * @param pointScale pointScale
      * @return pointScaleEntity
      */
-    private PointScaleEntity toPointScaleEntity(PointScale pointScale) {
+    private PointScaleEntity toPointScaleEntity(PointScale pointScale) throws ApiException {
         PointScaleEntity entity = new PointScaleEntity();
+
+        if(pointScale.getName().isEmpty()) {
+           throw new ApiException(400, "Name is empty");
+        }
+
+        if(pointScale.getDescription().isEmpty()) {
+            throw new ApiException(400, "Description is empty");
+        }
+
         entity.setName(pointScale.getName());
         entity.setDescription(pointScale.getDescription());
         return entity;

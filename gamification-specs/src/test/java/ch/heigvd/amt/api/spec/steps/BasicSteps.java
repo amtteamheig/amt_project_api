@@ -148,6 +148,49 @@ public class BasicSteps {
         }
     }
 
+    @When("The application {string} POST the {string} date badge payload to the \\/badges endpoint")
+    public void theApplicationPOSTTheDateBadgePayloadToTheBadgesEndpoint(String applicationReference, String date)
+            throws Throwable {
+        try {
+
+            // change api key if needed
+            checkCurrentApplication(applicationReference);
+
+            if(!date.isEmpty())
+                badge.setObtainedDate(LocalDate.parse(date));
+            else
+                badge.setObtainedDate(null);
+
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} imageURL badge payload to the \\/badges endpoint")
+    public void theApplicationPOSTTheImageURLBadgePayloadToTheBadgesEndpoint(String applicationReference, String imageUrl) {
+        try {
+            checkCurrentApplication(applicationReference);
+            badge.setImageUrl(imageUrl);
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the event payload to the /events endpoint")
+    public void iPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference) throws Throwable {
+        try {
+            checkCurrentApplication(applicationReference);
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
 
     @When("The application {string} POST the {string} pointScale payload to the \\/pointScales endpoint")
     public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference, String name) {
@@ -161,12 +204,12 @@ public class BasicSteps {
         }
     }
 
-
-    @When("The application {string} POST the event payload to the /events endpoint")
-    public void iPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference) throws Throwable {
+    @And("The application {string} POST the {string} description pointScale payload to the \\/pointScales endpoint")
+    public void theApplicationPOSTTheDescriptionPointScalePayloadToThePointScalesEndpoint(String applicationReference, String description) {
         try {
             checkCurrentApplication(applicationReference);
-            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            pointScale.setDescription(description);
+            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -427,5 +470,4 @@ public class BasicSteps {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
-
 }

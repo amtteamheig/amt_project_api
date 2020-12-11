@@ -53,6 +53,7 @@ public class RulesController implements RulesApi {
 
         //check if rule with this type already exists
         Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(rule.getIf().getType(),apiKeyId);
+
         if(ruleInRep.isPresent()){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Rule with given type already exists");
         }
@@ -110,6 +111,7 @@ public class RulesController implements RulesApi {
      * @return rule entity
      */
     private RuleEntity toRuleEntity(Rule rule) {
+        
         return RuleEntity.builder()
                 ._if(RuleEntity.If.builder()
                         .type(rule.getIf().getType())

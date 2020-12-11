@@ -29,7 +29,7 @@ paths:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    description: 'Name is empty'
+                    'Name is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -89,7 +89,7 @@ paths:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    description: 'Name is empty'
+                    'Name is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -160,7 +160,7 @@ paths:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    description: 'UserId is empty'
+                    'UserId is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /rules:
@@ -185,7 +185,7 @@ paths:
                 nameEmpty:
                   summary: Example of an error response
                   value:
-                    description: 'Type is empty'
+                    'Type is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '409':

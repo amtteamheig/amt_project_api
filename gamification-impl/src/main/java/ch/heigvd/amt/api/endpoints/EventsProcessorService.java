@@ -1,6 +1,8 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.EventsApi;
+import ch.heigvd.amt.api.exceptions.ApiException;
+import ch.heigvd.amt.api.model.APIError;
 import ch.heigvd.amt.api.model.Event;
 import ch.heigvd.amt.api.model.User;
 import ch.heigvd.amt.entities.ApiKeyEntity;
@@ -11,6 +13,7 @@ import ch.heigvd.amt.entities.awards.PointScaleAwardEntity;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.RuleRepository;
 import ch.heigvd.amt.repositories.UserRepository;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,9 +58,10 @@ public class EventsProcessorService implements EventsApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        //make sure event user ID isn't null
-        if(event.getUserId() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User id missing");
+        try {
+            checkEvent(event);
+        }catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
 
         Optional<UserEntity> userInRep = userRepository.findByApiKeyEntityValue_AndId(apiKeyId, event.getUserId());
@@ -121,6 +125,20 @@ public class EventsProcessorService implements EventsApi {
         user.getPointsAwards().add(pointScaleAwardEntity);
 
         return true;
+    }
+
+    private void checkEvent(Event event) throws ApiException {
+        if(event.getUserId() == null) {
+            throw new ApiException(400, "UserID is null");
+        }
+
+        if(event.getTimestamp() == null) {
+            throw new ApiException(400, "Timestamp is null");
+        }
+
+        if(event.getType().isEmpty()) {
+            throw new ApiException(400, "Type is empty");
+        }
     }
 
 }

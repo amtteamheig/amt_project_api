@@ -1,6 +1,7 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.BadgesApi;
+import ch.heigvd.amt.api.exceptions.ApiException;
 import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.api.model.Badge;
@@ -47,15 +48,21 @@ public class BadgesApiController implements BadgesApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        BadgeEntity newBadgeEntity = toBadgeEntity(badge);
-        newBadgeEntity.setApiKeyEntity(apiKey);
-        badgeRepository.save(newBadgeEntity);
+        try {
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(newBadgeEntity.getId()).toUri();
+            BadgeEntity newBadgeEntity = toBadgeEntity(badge);
+            newBadgeEntity.setApiKeyEntity(apiKey);
+            badgeRepository.save(newBadgeEntity);
 
-        return ResponseEntity.created(location).build();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(newBadgeEntity.getId()).toUri();
+
+            return ResponseEntity.created(location).build();
+
+        } catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        }
     }
 
     /**
@@ -99,11 +106,21 @@ public class BadgesApiController implements BadgesApi {
      * @param badge : badge
      * @return badge entity
      */
-    private BadgeEntity toBadgeEntity(Badge badge) {
+    private BadgeEntity toBadgeEntity(Badge badge) throws ApiException {
         BadgeEntity entity = new BadgeEntity();
+
+        if(badge.getName().isEmpty()) {
+            throw new ApiException(400, "Name is empty");
+        }
+
+        if(badge.getObtainedDate() == null) {
+            throw new ApiException(400, "Obtained date is empty");
+        }
+
         entity.setName(badge.getName());
         entity.setObtainedDate(badge.getObtainedDate());
         entity.setImageUrl(badge.getImageUrl());
+
         return entity;
     }
 
