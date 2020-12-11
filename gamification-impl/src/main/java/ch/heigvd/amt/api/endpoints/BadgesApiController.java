@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.json.*;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,6 +37,9 @@ public class BadgesApiController implements BadgesApi {
     ApiKeyRepository apiKeyRepository;
 
     @Autowired
+    HttpServletRequest httpServletRequest;
+
+    @Autowired
     ServletRequest servletRequest;
 
     @Autowired
@@ -43,6 +47,7 @@ public class BadgesApiController implements BadgesApi {
 
     /**
      * Servlet entry point POST /badges
+     *
      * @param badge (optional) badge object built by user
      * @return response
      */
@@ -68,6 +73,7 @@ public class BadgesApiController implements BadgesApi {
 
     /**
      * Servlet entry point GET /badges
+     *
      * @return response
      */
     @Override
@@ -109,6 +115,7 @@ public class BadgesApiController implements BadgesApi {
 
     /**
      * Servlet entry point GET /badge/id
+     *
      * @param id badge id
      * @return response
      */
@@ -179,7 +186,8 @@ public class BadgesApiController implements BadgesApi {
         badgeResponse.setObtainedDate(entity.getObtainedDate());
         badgeResponse.setImageUrl(entity.getImageUrl());
         Link self = new Link();
-        self.self(new URI(servletRequest.getLocalAddr() + "/badges/" + entity.getId()));
+        String url = httpServletRequest.getRequestURI();
+        self.self(new URI(url + "/badges/" + entity.getId()));
         badgeResponse.setLinks(Collections.singletonList(self));
         return badgeResponse;
     }

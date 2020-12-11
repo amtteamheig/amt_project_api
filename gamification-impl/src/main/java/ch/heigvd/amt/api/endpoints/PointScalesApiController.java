@@ -23,6 +23,7 @@ import javax.json.JsonPatch;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,10 +47,14 @@ public class PointScalesApiController implements PointScalesApi {
     ServletRequest servletRequest;
 
     @Autowired
+    HttpServletRequest httpServletRequest;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     /**
      * Servlet entry point POST /pointScales
+     *
      * @param pointScale (optional) pointScale object built by user
      * @return response
      */
@@ -74,6 +79,7 @@ public class PointScalesApiController implements PointScalesApi {
 
     /**
      * Servlet entry point GET /pointScales
+     *
      * @return response
      */
     @Override
@@ -100,6 +106,7 @@ public class PointScalesApiController implements PointScalesApi {
 
     /**
      * Servlet entry point GET /pointScale/id
+     *
      * @param id pointScale's id
      * @return response
      */
@@ -138,7 +145,7 @@ public class PointScalesApiController implements PointScalesApi {
                 pointScaleRepository.save(patched);
             }
             return ResponseEntity.ok().build();
-        }catch (JsonException e ){
+        } catch (JsonException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The body is malformed");
         }
 
@@ -146,6 +153,7 @@ public class PointScalesApiController implements PointScalesApi {
 
     /**
      * convert pointScale to pointScaleEntity
+     *
      * @param pointScale pointScale
      * @return pointScaleEntity
      */
@@ -158,6 +166,7 @@ public class PointScalesApiController implements PointScalesApi {
 
     /**
      * convert pointScaleEntity to pointScale
+     *
      * @param entity pointScaleEntity
      * @return pointScale
      */
@@ -170,6 +179,7 @@ public class PointScalesApiController implements PointScalesApi {
 
     /**
      * convert pointScaleEntity to pointScaleResponse
+     *
      * @param entity pointScaleEntity
      * @return pointScale response
      * @throws URISyntaxException
@@ -179,7 +189,8 @@ public class PointScalesApiController implements PointScalesApi {
         pointScaleResponse.setName(entity.getName());
         pointScaleResponse.setDescription(entity.getDescription());
         Link self = new Link();
-        self.self(new URI(servletRequest.getLocalAddr() + "/pointScales/" + entity.getId()));
+        String url = httpServletRequest.getRequestURI();
+        self.self(new URI(url + "/badges/" + entity.getId()));
         pointScaleResponse.setLinks(Collections.singletonList(self));
         return pointScaleResponse;
     }
