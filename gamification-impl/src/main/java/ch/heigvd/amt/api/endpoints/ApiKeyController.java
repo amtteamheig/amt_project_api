@@ -18,6 +18,10 @@ public class ApiKeyController implements RegistrationApi {
     @Autowired
     ApiKeyRepository apiKeyRepository;
 
+    /**
+     * Servlet entry point POST /events
+     * @return response
+     */
     @Override
     public ResponseEntity<ApiKey> registerApplication() {
 
@@ -30,6 +34,11 @@ public class ApiKeyController implements RegistrationApi {
         return new ResponseEntity<>(apiKey, HttpStatus.CREATED);
     }
 
+    /**
+     * Converts apiKey to apiKeyEntity
+     * @param apiKey key
+     * @return apiKeyEntity
+     */
     private ApiKeyEntity toApiKeyEntity(ApiKey apiKey) {
         ApiKeyEntity entity = new ApiKeyEntity();
         entity.setValue(apiKey.getValue().toString());

@@ -12,12 +12,10 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,6 +29,7 @@ public class BasicSteps {
     PointScale pointScale;
     User user;
     Event event;
+    Rule rule;
 
     private ApiResponse lastApiResponse;
     private ApiException lastApiException;
@@ -43,6 +42,9 @@ public class BasicSteps {
     private Badge lastReceivedBadge;
     private PointScale lastReceivedPointScale;
     private User lastReceivedUser;
+    private Rule lastReceivedRule;
+
+    private String lastRuleType;
 
     // Keep track of the application created during the scenarios execution
     private final Map<String, ApiKey> applications = new HashMap<>();
@@ -104,12 +106,26 @@ public class BasicSteps {
         ;
     }
 
-    @Given("I have an event payload")
-    public void iHaveAnEventPayload() throws Throwable {
+    @Given("The application has a {string} event payload")
+    public void iHaveAnEventPayload(String ruleType) throws Throwable {
         event = new ch.heigvd.amt.api.dto.Event()
                 .timestamp(OffsetDateTime.now())
-                .type("Rule type")
+                .type(ruleType)
                 .userId(user.getId());
+    }
+
+    @Given("The application has a rule payload")
+    public void theApplicationHasARulePayload() {
+        lastRuleType = generateRandomNewString();
+        rule = new ch.heigvd.amt.api.dto.Rule()
+                ._if(new RuleIf().type(lastRuleType))
+                .then(new RuleThen()
+                        .awardBadge(URI.create("badges/1"))
+                        .awardPoints(new RuleThenAwardPoints()
+                            .amount(1)
+                            .pointScale(URI.create("pointScales/1"))
+                        )
+                );
     }
 
     /*
@@ -146,10 +162,23 @@ public class BasicSteps {
     }
 
 
-    @When("^I POST the event payload to the /events endpoint")
-    public void iPOSTTheEventPayloadToTheEventsEndpoint() throws Throwable {
+    @When("The application {string} POST the event payload to the /events endpoint")
+    public void iPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference) throws Throwable {
         try {
+            checkCurrentApplication(applicationReference);
             lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} rule payload to the \\/rules endpoint")
+    public void theApplicationPOSTTheRulePayloadToTheRulesEndpoint(String applicationReference, String ruleName) {
+        try {
+            checkCurrentApplication(applicationReference);
+            rule.setIf(new RuleIf().type(ruleName));
+            lastApiResponse = api.createRuleWithHttpInfo(rule);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -176,7 +205,6 @@ public class BasicSteps {
         try {
 
             checkCurrentApplication(applicationReference);
-
             lastApiResponse = api.getBadgesWithHttpInfo();
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
@@ -235,8 +263,22 @@ public class BasicSteps {
 
     }
 
+    @When("The application {string} sends a GET to the rule URL in the location header")
+    public void theApplicationSendsAGETToTheRuleURLInTheLocationHeader(String applicationReference) {
+        Integer id = Integer
+                .parseInt(lastReceivedLocationHeader.substring(lastReceivedLocationHeader.lastIndexOf('/') + 1));
+        try {
+            checkCurrentApplication(applicationReference);
+            lastApiResponse = api.getRuleWithHttpInfo(id);
+            processApiResponse(lastApiResponse);
+            lastReceivedRule = (Rule) lastApiResponse.getData();
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
 
-    @When("I send a GET to the user URL in the location header")
+
+    @When("The application sends a GET to the user URL in the location header")
     public void iSendAGETToTheUserURLInTheLocationHeader() {
         try {
             lastApiResponse = api.getUserWithHttpInfo(user.getId());
@@ -247,15 +289,17 @@ public class BasicSteps {
         }
     }
 
-    @When("^I send a GET to the /users endpoint$")
-    public void iSendAGETToTheUsersEndpoint() {
+    @When("The application {string} sends a GET to the /users endpoint")
+    public void iSendAGETToTheUsersEndpoint(String applicationReference) {
         try {
+            checkCurrentApplication(applicationReference);
             lastApiResponse = api.getUsersWithHttpInfo();
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
         }
     }
+
 
     /*
         ====  RECEPTION  ====
@@ -276,13 +320,22 @@ public class BasicSteps {
         assertEquals(pointScale, lastReceivedPointScale);
     }
 
-    @And("I receive a payload with points and badges")
-    public void iReceiveAPayloadWithPointsAndBadges() {
+    @And("The application receives a payload that is the same as the rule payload")
+    public void theApplicationReceivesAPayloadThatIsTheSameAsTheRulePayload() {
+        assertEquals(rule, lastReceivedRule);
+    }
+
+    @And("The application receives a payload with {int} point\\(s) and {int} badge\\(s)")
+    public void iReceiveAPayloadWithPointsAndBadges(int sizePoints, int sizeBadges) {
         assert user.getId() != null;
         String lastReceivedUserString = lastReceivedUser.toString();
         Assert.assertTrue(lastReceivedUserString.contains(user.getId()));
         Assert.assertTrue(lastReceivedUserString.contains("points"));
         Assert.assertTrue(lastReceivedUserString.contains("badges"));
+        assert lastReceivedUser.getBadgesAwards() != null;
+        assertEquals(lastReceivedUser.getBadgesAwards().size(),sizeBadges);
+        assert lastReceivedUser.getPointsAwards() != null;
+        assertEquals(lastReceivedUser.getPointsAwards().size(),sizePoints);
     }
 
     @And("The application {string} GET to the /badges endpoint receive a list containing {int} badge\\(s)")
@@ -309,9 +362,30 @@ public class BasicSteps {
         }
     }
 
+    @Then("The application {string} GET to the \\/rules endpoint receive a list containing {int} rule\\(s)")
+    public void theApplicationGETToTheRulesEndpointReceiveAListContainingRuleS(String applicationReference, int size) {
+        try {
+            checkCurrentApplication(applicationReference);
+            List<Rule> rules = api.getRules();
+            assertEquals(rules.size(), size);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
     @And("The application receives a badge that was created today")
     public void theApplicationReceiveABadgeThatWasCreatedToday() {
         assertEquals(badge.getObtainedDate(), LocalDate.now());
+    }
+
+    @And("The application receives {int} users")
+    public void theApplicationReceivesUsers(int size) {
+        try {
+            List<User> users = api.getUsers();
+            assertEquals(users.size(), size);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
     }
 
     /*
@@ -341,4 +415,17 @@ public class BasicSteps {
             api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
         }
     }
+
+    private String generateRandomNewString(){
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+
+        return random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
+
 }

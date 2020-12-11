@@ -22,15 +22,14 @@ public class BadgeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "fk_apikey")
+    private ApiKeyEntity apiKeyEntity;
 
+    private String name;
     private JsonNullable<String> imageUrl;
 
     @Column(columnDefinition = "DATE")
     private LocalDate obtainedDate;
-
-    @ManyToOne
-    @JoinColumn(name = "fk_apikey")
-    private ApiKeyEntity apiKeyEntity;
 
 }

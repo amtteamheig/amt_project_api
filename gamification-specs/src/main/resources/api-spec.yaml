@@ -4,6 +4,7 @@ info:
   title: Gamification API
   description: API of our gamification
 security:
+  #  - bearerAuth: []
   - apiKeyAuth: []
 paths:
   /badges:
@@ -65,7 +66,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          description: not found
   /pointScales:
     post:
       description: create a pointScale
@@ -124,6 +125,8 @@ paths:
                 $ref: '#/components/schemas/PointScale'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: not found
   /registration:
     post:
       description: registrate application
@@ -185,6 +188,8 @@ paths:
                     description: 'Type is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: conflict with existing rule
     get:
       description: get the list of rules
       operationId: getRules
@@ -219,7 +224,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          description: not found
   /users:
     get:
       description: get the list of users
@@ -255,8 +260,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
-
+          description: not found
 
 components:
   securitySchemes:
@@ -275,8 +279,6 @@ components:
         WWW_Authenticate:
           schema:
             type: string
-    NotFoundError:
-      description: entity not found
   schemas:
     PointScale:
       type: object
@@ -338,19 +340,34 @@ components:
       properties:
         id:
           type: string
-        badges:
+        badgesAwards:
           type: array
           items:
-            $ref: '#/components/schemas/Badge'
-        points:
+            $ref: '#/components/schemas/BadgeAward'
+        pointsAwards:
           type: array
           items:
-            type: object
-            properties:
-              pointScale:
-                $ref: '#/components/schemas/PointScale'
-              amount:
-                type: integer
+            $ref: '#/components/schemas/PointscaleAward'
+    Award:
+      type: object
+      properties:
+        reason:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+          format: uri
+    BadgeAward:
+      allOf:
+        - $ref: '#/components/schemas/Award'
+    PointscaleAward:
+      allOf:
+        - $ref: '#/components/schemas/Award'
+      properties:
+        amount:
+          type: integer
     ApiKey:
       type: object
       properties:
