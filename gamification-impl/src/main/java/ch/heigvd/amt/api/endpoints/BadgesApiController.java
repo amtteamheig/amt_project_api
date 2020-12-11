@@ -183,7 +183,8 @@ public class BadgesApiController implements BadgesApi {
         badgeResponse.setObtainedDate(entity.getObtainedDate());
         badgeResponse.setImageUrl(entity.getImageUrl());
         Link self = new Link();
-        String url = servletRequest.getServerName() + ":" + servletRequest.getServerPort();
+        String url = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" +
+                servletRequest.getServerPort();
         self.self(new URI(url + "/badges/" + entity.getId()));
         badgeResponse.setLinks(Collections.singletonList(self));
         return badgeResponse;

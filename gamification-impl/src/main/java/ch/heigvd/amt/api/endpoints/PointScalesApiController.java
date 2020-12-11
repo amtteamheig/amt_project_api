@@ -186,7 +186,8 @@ public class PointScalesApiController implements PointScalesApi {
         pointScaleResponse.setName(entity.getName());
         pointScaleResponse.setDescription(entity.getDescription());
         Link self = new Link();
-        String url = servletRequest.getServerName() + ":" + servletRequest.getServerPort();
+        String url = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" +
+                servletRequest.getServerPort();
         self.self(new URI(url + "/badges/" + entity.getId()));
         pointScaleResponse.setLinks(Collections.singletonList(self));
         return pointScaleResponse;
