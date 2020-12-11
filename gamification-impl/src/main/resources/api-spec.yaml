@@ -19,6 +19,17 @@ paths:
       responses:
         '201':
           description: created
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    description: 'Name is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -68,6 +79,17 @@ paths:
       responses:
         '201':
           description: created
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    description: 'Name is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -128,6 +150,17 @@ paths:
       responses:
         '200':
           description: success
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    description: 'UserId is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /rules:
@@ -142,6 +175,17 @@ paths:
       responses:
         '201':
           description: created
+        '400':
+          description: bad request
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                nameEmpty:
+                  summary: Example of an error response
+                  value:
+                    description: 'Type is empty'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '409':
@@ -242,6 +286,11 @@ components:
         name:
           type: string
         description:
+          type: string
+    Error:
+      type: object
+      properties:
+        msg:
           type: string
     Badge:
       type: object
