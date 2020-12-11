@@ -74,7 +74,7 @@ public class UsersController implements UsersApi {
      * @param entity : user entity
      * @return user
      */
-    private User toUser(UserEntity entity) {
+    public static User toUser(UserEntity entity) {
         User user = new User();
         user.setId(entity.getId());
 

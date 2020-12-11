@@ -73,6 +73,7 @@ public class BasicSteps {
         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
         applications.put(applicationReference, apiKey);
         applicationUsers.put(applicationReference, new HashMap<>());
+        System.out.println("API KEY : " + apiKey.getValue());
     }
 
     @Given("there is a user {string} with an ID for the application {string}")

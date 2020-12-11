@@ -10,6 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Data
+@Table(name = "Apikey")
 public class ApiKeyEntity {
 
     @Id

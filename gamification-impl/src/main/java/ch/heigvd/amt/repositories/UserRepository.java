@@ -13,6 +13,6 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
     Optional<List<UserEntity>> findByApiKeyEntityValue(String apiKeyId);
     Optional<UserEntity> findByApiKeyEntityValue_AndId(String apiKeyId, String UserId);
 
-
-    Optional<List> getPointScaleLeaderBoard(String apiKeyId, Integer id, Integer limit);
+    @Query(value = "SELECT * FROM User WHERE User.fk_apikey = ?1", nativeQuery = true)
+    Optional<List<UserEntity>> getPointScaleLeaderBoard(String apiKeyId, Integer id, Integer limit);
 }

@@ -16,6 +16,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @Builder
+@Table(name = "Rule")
 public class RuleEntity {
 
     @Id
@@ -36,6 +37,7 @@ public class RuleEntity {
     @Entity
     @Data
     @Builder
+    @Table(name = "RuleIf")
     public static class If {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +51,7 @@ public class RuleEntity {
     @Entity
     @Data
     @Builder
+    @Table(name = "RuleThen")
     public static class Then {
 
         @Id
@@ -64,6 +67,7 @@ public class RuleEntity {
         @Entity
         @Data
         @Builder
+        @Table(name = "RuleThenAwardPoints")
         public static class AwardPoints {
 
             @Id
