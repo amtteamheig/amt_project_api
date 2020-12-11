@@ -1,4 +1,4 @@
-Feature: Check server is running
+Feature: Validation of pointScale implementation
 
   Background:
     Given there is a Gamification server

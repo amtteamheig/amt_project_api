@@ -30,7 +30,7 @@ Feature: Validation of badges implementation
   #
   # Check date of a badge (POST / GET with date check that it's the same day)
   #
-  Scenario:
+  Scenario: check date of a badge
     Given The application has a badge payload
     When The application "A1" POST the "Diamond" badge payload to the /badges endpoint
     Then The application receives a 201 status code
