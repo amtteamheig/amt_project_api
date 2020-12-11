@@ -47,9 +47,6 @@ public class PointScalesApiController implements PointScalesApi {
     ServletRequest servletRequest;
 
     @Autowired
-    HttpServletRequest httpServletRequest;
-
-    @Autowired
     ObjectMapper objectMapper;
 
     /**
@@ -189,7 +186,7 @@ public class PointScalesApiController implements PointScalesApi {
         pointScaleResponse.setName(entity.getName());
         pointScaleResponse.setDescription(entity.getDescription());
         Link self = new Link();
-        String url = httpServletRequest.getRequestURI();
+        String url = servletRequest.getServerName() + ":" + servletRequest.getServerPort();
         self.self(new URI(url + "/badges/" + entity.getId()));
         pointScaleResponse.setLinks(Collections.singletonList(self));
         return pointScaleResponse;

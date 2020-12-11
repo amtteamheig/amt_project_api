@@ -37,9 +37,6 @@ public class BadgesApiController implements BadgesApi {
     ApiKeyRepository apiKeyRepository;
 
     @Autowired
-    HttpServletRequest httpServletRequest;
-
-    @Autowired
     ServletRequest servletRequest;
 
     @Autowired
@@ -186,7 +183,7 @@ public class BadgesApiController implements BadgesApi {
         badgeResponse.setObtainedDate(entity.getObtainedDate());
         badgeResponse.setImageUrl(entity.getImageUrl());
         Link self = new Link();
-        String url = httpServletRequest.getRequestURI();
+        String url = servletRequest.getServerName() + ":" + servletRequest.getServerPort();
         self.self(new URI(url + "/badges/" + entity.getId()));
         badgeResponse.setLinks(Collections.singletonList(self));
         return badgeResponse;
