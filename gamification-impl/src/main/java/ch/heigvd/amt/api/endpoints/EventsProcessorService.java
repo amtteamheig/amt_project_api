@@ -77,10 +77,11 @@ public class EventsProcessorService implements EventsApi {
         }
 
         //check rules
-        if(handleRules(event,user,apiKeyId)){
+        try {
+            handleRules(event,user,apiKeyId);
             userRepository.save(user);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find Rule with type " + event.getType());
+        } catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
 
         return ResponseEntity.ok().build();
@@ -92,7 +93,7 @@ public class EventsProcessorService implements EventsApi {
      * @param user current user
      * @return true if a rule with event type was found
      */
-    private boolean handleRules(Event event, UserEntity user, String apiKeyId){
+    private void handleRules(Event event, UserEntity user, String apiKeyId) throws ApiException{
 
         //TODO : Change reason for something else than the type of the rule
         //TODO : Check if badge and pointScale exists
@@ -101,7 +102,7 @@ public class EventsProcessorService implements EventsApi {
 
         //if no rules found with given type, return
         if(ruleInRep.isEmpty()){
-            return false;
+            throw new ApiException(400, "Cannot find Rule with type " + event.getType());
         }
 
         //init
@@ -123,10 +124,13 @@ public class EventsProcessorService implements EventsApi {
         //update user
         user.getBadgesAwards().add(badgeAwardEntity);
         user.getPointsAwards().add(pointScaleAwardEntity);
-
-        return true;
     }
 
+    /**
+     * Check if the attributes of the event are correct
+     * @param event
+     * @throws ApiException
+     */
     private void checkEvent(Event event) throws ApiException {
         if(event.getUserId() == null) {
             throw new ApiException(400, "UserID is null");

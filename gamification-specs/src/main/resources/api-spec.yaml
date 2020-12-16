@@ -276,7 +276,7 @@ components:
     UnauthorizedError:
       description: API key is missing or invalid
       headers:
-        WWW_Authenticate:
+        X-API-KEY:
           schema:
             type: string
   schemas:

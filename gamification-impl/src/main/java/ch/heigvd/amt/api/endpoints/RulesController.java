@@ -2,6 +2,7 @@ package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.RulesApi;
 import ch.heigvd.amt.api.RulesApi;
+import ch.heigvd.amt.api.exceptions.ApiException;
 import ch.heigvd.amt.api.model.RuleIf;
 import ch.heigvd.amt.api.model.RuleThen;
 import ch.heigvd.amt.api.model.RuleThenAwardPoints;
@@ -58,15 +59,19 @@ public class RulesController implements RulesApi {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Rule with given type already exists");
         }
 
-        RuleEntity newRuleEntity = toRuleEntity(rule);
-        newRuleEntity.setApiKeyEntity(apiKey);
-        ruleRepository.save(newRuleEntity);
+        try {
+            RuleEntity newRuleEntity = toRuleEntity(rule);
+            newRuleEntity.setApiKeyEntity(apiKey);
+            ruleRepository.save(newRuleEntity);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(newRuleEntity.getId()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(newRuleEntity.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+            return ResponseEntity.created(location).build();
+        } catch (ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        }
     }
 
     /**
@@ -110,8 +115,24 @@ public class RulesController implements RulesApi {
      * @param rule : rule
      * @return rule entity
      */
-    private RuleEntity toRuleEntity(Rule rule) {
-        
+    private RuleEntity toRuleEntity(Rule rule) throws ApiException {
+
+        if(rule.getIf().getType().isEmpty()) {
+            throw new ApiException(400, "Type of If is empty");
+        }
+
+        if(rule.getThen().getAwardBadge().toString().isEmpty()) {
+            throw new ApiException(400, "AwardBadge of Then is empty");
+        }
+
+        if(rule.getThen().getAwardPoints().getPointScale().toString().isEmpty()) {
+            throw new ApiException(400, "PointScale of AwardPoints of Then is empty");
+        }
+
+        if(rule.getThen().getAwardPoints().getAmount() == 0) {
+            throw new ApiException(400, "Amount of AwardPoints of Then = 0");
+        }
+
         return RuleEntity.builder()
                 ._if(RuleEntity.If.builder()
                         .type(rule.getIf().getType())

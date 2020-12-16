@@ -22,6 +22,7 @@ Feature: Validation of badges implementation
     Given The application has a badge payload
     When The application "A1" POST the "" badge payload to the /badges endpoint
     Then The application receives a 400 status code
+    Given The application has a badge payload
     And The application "A1" POST the "" date badge payload to the /badges endpoint
     Then The application receives a 400 status code
 

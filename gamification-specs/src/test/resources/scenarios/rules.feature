@@ -17,6 +17,24 @@ Feature: Validation of rules implementation
     And The application receives a payload that is the same as the rule payload
 
   #
+  # Create a rule
+  #
+
+  Scenario: the API should return a 400 status code when the attributes are incorrect
+    Given The application has a rule payload
+    When The application "A1" POST the "" rule payload to the /rules endpoint
+    Then The application receives a 400 status code
+    Given The application has a rule payload
+    When The application "A1" POST the "" awardBadge of then rule payload to the /rules endpoint
+    Then The application receives a 400 status code
+    Given The application has a rule payload
+    When The application "A1" POST the "" pointScale of awardPoints of then rule payload to the /rules endpoint
+    Then The application receives a 400 status code
+    Given The application has a rule payload
+    When The application "A1" POST the 0 amount of awardPoints of then rule payload to the /rules endpoint
+    Then The application receives a 400 status code
+
+  #
   # Create a rule (POST / GET with user property check)
   #
   Scenario: 2 applications retrieve only their rules
