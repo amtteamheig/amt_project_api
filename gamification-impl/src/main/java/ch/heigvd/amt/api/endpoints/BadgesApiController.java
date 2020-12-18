@@ -1,6 +1,7 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.BadgesApi;
+import ch.heigvd.amt.api.exceptions.ApiException;
 import ch.heigvd.amt.api.model.BadgeResponse;
 import ch.heigvd.amt.api.model.JsonPatchDocument;
 import ch.heigvd.amt.api.model.Link;
@@ -57,15 +58,21 @@ public class BadgesApiController implements BadgesApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        BadgeEntity newBadgeEntity = toBadgeEntity(badge);
-        newBadgeEntity.setApiKeyEntity(apiKey);
-        badgeRepository.save(newBadgeEntity);
+        try {
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(newBadgeEntity.getId()).toUri();
+            BadgeEntity newBadgeEntity = toBadgeEntity(badge);
+            newBadgeEntity.setApiKeyEntity(apiKey);
+            badgeRepository.save(newBadgeEntity);
 
-        return ResponseEntity.created(location).build();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(newBadgeEntity.getId()).toUri();
+
+            return ResponseEntity.created(location).build();
+
+        } catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        }
     }
 
     /**
@@ -112,7 +119,6 @@ public class BadgesApiController implements BadgesApi {
 
     /**
      * Servlet entry point GET /badge/id
-     *
      * @param id badge id
      * @return response
      */
@@ -144,12 +150,24 @@ public class BadgesApiController implements BadgesApi {
 
     /**
      * Converts a badge to a badge entity
-     *
      * @param badge : badge
      * @return badge entity
      */
-    private BadgeEntity toBadgeEntity(Badge badge) {
+    private BadgeEntity toBadgeEntity(Badge badge) throws ApiException {
         BadgeEntity entity = new BadgeEntity();
+
+        if(badge == null){
+            throw new ApiException(400, "Body is empty");
+        }
+
+        if(badge.getName() == null || badge.getName().isEmpty()) {
+            throw new ApiException(400, "Name is empty");
+        }
+
+        if(badge.getObtainedDate() == null) {
+            throw new ApiException(400, "Obtained date is empty");
+        }
+
         entity.setName(badge.getName());
         entity.setObtainedDate(badge.getObtainedDate());
         entity.setImageUrl(badge.getImageUrl());
@@ -158,7 +176,6 @@ public class BadgesApiController implements BadgesApi {
 
     /**
      * Converts a badge entity to a badge
-     *
      * @param entity : badge entity
      * @return badge
      */

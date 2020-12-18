@@ -4,6 +4,7 @@ import ch.heigvd.amt.api.PointScalesApi;
 import ch.heigvd.amt.api.model.JsonPatchDocument;
 import ch.heigvd.amt.api.model.Link;
 import ch.heigvd.amt.api.model.PointScaleResponse;
+import ch.heigvd.amt.api.exceptions.ApiException;
 import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.PointScaleEntity;
 import ch.heigvd.amt.api.model.PointScale;
@@ -63,15 +64,19 @@ public class PointScalesApiController implements PointScalesApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
-        newPointScaleEntity.setApiKeyEntity(apiKey);
-        pointScaleRepository.save(newPointScaleEntity);
+        try {
+            PointScaleEntity newPointScaleEntity = toPointScaleEntity(pointScale);
+            newPointScaleEntity.setApiKeyEntity(apiKey);
+            pointScaleRepository.save(newPointScaleEntity);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(newPointScaleEntity.getId()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(newPointScaleEntity.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+            return ResponseEntity.created(location).build();
+        } catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        }
     }
 
     /**
@@ -154,8 +159,21 @@ public class PointScalesApiController implements PointScalesApi {
      * @param pointScale pointScale
      * @return pointScaleEntity
      */
-    private PointScaleEntity toPointScaleEntity(PointScale pointScale) {
+    private PointScaleEntity toPointScaleEntity(PointScale pointScale) throws ApiException {
         PointScaleEntity entity = new PointScaleEntity();
+
+        if(pointScale == null){
+            throw new ApiException(400, "Body is empty");
+        }
+
+        if(pointScale.getName() == null || pointScale.getName().isEmpty()) {
+           throw new ApiException(400, "Name is empty");
+        }
+
+        if(pointScale.getDescription() == null || pointScale.getDescription().isEmpty()) {
+            throw new ApiException(400, "Description is empty");
+        }
+
         entity.setName(pointScale.getName());
         entity.setDescription(pointScale.getDescription());
         return entity;
@@ -188,7 +206,7 @@ public class PointScalesApiController implements PointScalesApi {
         Link self = new Link();
         String url = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" +
                 servletRequest.getServerPort();
-        self.self(new URI(url + "/badges/" + entity.getId()));
+        self.self(new URI(url + "/pointScales/" + entity.getId()));
         pointScaleResponse.setLinks(Collections.singletonList(self));
         return pointScaleResponse;
     }

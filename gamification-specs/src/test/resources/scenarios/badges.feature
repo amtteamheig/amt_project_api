@@ -16,6 +16,24 @@ Feature: Validation of badges implementation
     And The application receives a payload that is the same as the badge payload
 
   #
+  # Create a badge (POST) with bad attributes
+  #
+  Scenario: the API should return a 400 status code when the attributes are incorrect
+    Given The application has a badge payload
+    When The application "A1" POST the "" badge payload to the /badges endpoint
+    Then The application receives a 400 status code
+    Given The application has a badge payload
+    And The application "A1" POST the "" date badge payload to the /badges endpoint
+    Then The application receives a 400 status code
+
+  #
+  # Create a badge (POST) with imageURL is empty
+  Scenario: the API should return a 201 status code when imageURL is empty
+    Given The application has a badge payload
+    When The application "A1" POST the "url" imageURL badge payload to the /badges endpoint
+    Then The application receives a 201 status code
+
+  #
   # Create a badge (POST / GET with user property check)
   #
   Scenario: 2 applications retrieve only their badges

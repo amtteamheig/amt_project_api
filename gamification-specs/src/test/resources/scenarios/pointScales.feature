@@ -46,3 +46,13 @@ Feature: Validation of pointScale implementation
     When The application "A1" PATCH a point scale named "Test Rank", he want to change the attribute "test" with the value "Bla"
     Then The application receives a 400 status code
 
+
+
+  #
+  # Create a point scale (POST) with bad attributes
+  Scenario: the API should return a 400 status code when the attributes are incorrect
+    Given The application has a pointScale payload
+    When The application "A1" POST the "" pointScale payload to the /pointScales endpoint
+    Then The application receives a 400 status code
+    And The application "A1" POST the "" description pointScale payload to the /pointScales endpoint
+    Then The application receives a 400 status code

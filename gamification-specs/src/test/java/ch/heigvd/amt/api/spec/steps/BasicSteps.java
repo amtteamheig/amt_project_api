@@ -19,6 +19,7 @@ import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import org.junit.Assert;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -185,9 +186,91 @@ public class BasicSteps {
 
             // change api key if needed
             checkCurrentApplication(applicationReference);
-
             badge.setName(name);
+
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} date badge payload to the \\/badges endpoint")
+    public void theApplicationPOSTTheDateBadgePayloadToTheBadgesEndpoint(String applicationReference, String date)
+            throws Throwable {
+        try {
+
+            // change api key if needed
+            checkCurrentApplication(applicationReference);
+
+            if(!date.isEmpty())
+                badge.setObtainedDate(LocalDate.parse(date));
+            else
+                badge.setObtainedDate(null);
+
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} imageURL badge payload to the \\/badges endpoint")
+    public void theApplicationPOSTTheImageURLBadgePayloadToTheBadgesEndpoint(String applicationReference, String imageUrl) {
+        try {
+            checkCurrentApplication(applicationReference);
+            badge.setImageUrl(imageUrl);
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the event payload to the /events endpoint")
+    public void iPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference) throws Throwable {
+        try {
+            checkCurrentApplication(applicationReference);
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the event {string} payload to the \\/events endpoint")
+    public void theApplicationPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference, String type) {
+        try {
+            checkCurrentApplication(applicationReference);
+            event.setType(type);
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the event timestamp {string} payload to the \\/events endpoint")
+    public void theApplicationPOSTTheEventTimestampPayloadToTheEventsEndpoint(String applicationReference, String timestamp) {
+        try {
+            checkCurrentApplication(applicationReference);
+            if (timestamp.isEmpty())
+                event.setTimestamp(null);
+            else
+                event.setTimestamp(OffsetDateTime.parse(timestamp));
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the event userId {string} payload to the \\/events endpoint")
+    public void theApplicationPOSTTheEventUserIdPayloadToTheEventsEndpoint(String applicationReference, String userId) {
+        try {
+            checkCurrentApplication(applicationReference);
+            event.setUserId(userId);
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -209,12 +292,12 @@ public class BasicSteps {
         }
     }
 
-
-    @When("The application {string} POST the event payload to the /events endpoint")
-    public void iPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference) throws Throwable {
+    @And("The application {string} POST the {string} description pointScale payload to the \\/pointScales endpoint")
+    public void theApplicationPOSTTheDescriptionPointScalePayloadToThePointScalesEndpoint(String applicationReference, String description) {
         try {
             checkCurrentApplication(applicationReference);
-            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            pointScale.setDescription(description);
+            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
@@ -226,6 +309,68 @@ public class BasicSteps {
         try {
             checkCurrentApplication(applicationReference);
             rule.setIf(new RuleIf().type(ruleName));
+            lastApiResponse = api.createRuleWithHttpInfo(rule);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} awardBadge of then rule payload to the \\/rules endpoint")
+    public void theApplicationPOSTTheAwardBadgeOfThenRulePayloadToTheRulesEndpoint(String applicationReference, String awardBadge) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            rule.setThen(
+                    new RuleThen()
+                            .awardBadge(URI.create(awardBadge))
+                            .awardPoints(rule.getThen().getAwardPoints())
+            );
+
+            lastApiResponse = api.createRuleWithHttpInfo(rule);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} pointScale of awardPoints of then rule payload to the \\/rules endpoint")
+    public void theApplicationPOSTThePointScaleOfAwardPointsOfThenRulePayloadToTheRulesEndpoint(String applicationReference, String pointScale) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            URI createdURI = URI.create(pointScale);
+
+            rule.setThen(
+                    new RuleThen()
+                            .awardBadge(rule.getThen().getAwardBadge())
+                            .awardPoints(new RuleThenAwardPoints()
+                                    .pointScale(createdURI)
+                                    .amount(rule.getThen().getAwardPoints().getAmount())
+                            )
+            );
+
+            lastApiResponse = api.createRuleWithHttpInfo(rule);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {int} amount of awardPoints of then rule payload to the \\/rules endpoint")
+    public void theApplicationPOSTTheAmountOfAwardPointsOfThenRulePayloadToTheRulesEndpoint(String applicationReference, int amount) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            rule.setThen(
+                    new RuleThen()
+                            .awardBadge(rule.getThen().getAwardBadge())
+                            .awardPoints(new RuleThenAwardPoints()
+                                    .pointScale(rule.getThen().getAwardPoints().getPointScale())
+                                    .amount(amount)
+                            )
+            );
+
             lastApiResponse = api.createRuleWithHttpInfo(rule);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
@@ -590,5 +735,4 @@ public class BasicSteps {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
-
 }
