@@ -10,6 +10,12 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+
 import org.junit.Assert;
 
 import java.net.URI;
@@ -17,9 +23,9 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class BasicSteps {
 
@@ -40,8 +46,8 @@ public class BasicSteps {
     private ApiKey apiKey;
     private String lastReceivedLocationHeader;
 
-    private Badge lastReceivedBadge;
-    private PointScale lastReceivedPointScale;
+    private BadgeResponse lastReceivedBadge;
+    private PointScaleResponse lastReceivedPointScale;
     private User lastReceivedUser;
     private Rule lastReceivedRule;
 
@@ -74,6 +80,7 @@ public class BasicSteps {
         api.getApiClient().addDefaultHeader("X-API-KEY", apiKey.getValue().toString());
         applications.put(applicationReference, apiKey);
         applicationUsers.put(applicationReference, new HashMap<>());
+        System.out.println("API KEY : " + apiKey.getValue());
     }
 
     @Given("there is a user {string} with an ID for the application {string}")
@@ -84,6 +91,45 @@ public class BasicSteps {
 
         applicationUsers.get(applicationReference).put(userReference, user);
     }
+
+    @And("The application {string} contains a badge named {string} as {string} attribute")
+    public void theApplicationContainsABadgeNamedAsAttribute(String applicationReference, String value,
+                                                             String attribute) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<BadgeResponse>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<BadgeResponse> badges = getBadgeResponse.getData();
+
+            assertThat(badges, contains(
+                    hasProperty(attribute, is(value))
+            ));
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+
+    @And("The application {string} contains a point scale named {string} as {string} attribute")
+    public void theApplicationContainsAPointScaleNamedAsAttribute(String applicationReference, String value,
+                                                                  String attribute) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<PointScaleResponse>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScaleResponse> pointScales = getPointScalesResponse.getData();
+
+            assertThat(pointScales, contains(
+                    hasProperty(attribute, is(value))
+            ));
+
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+
+    }
+
 
     /*
         ====  PAYLOADS  ====
@@ -232,10 +278,12 @@ public class BasicSteps {
     }
 
 
-    @When("The application {string} POST the {string} pointScale payload to the \\/pointScales endpoint")
-    public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference, String name) {
+    @When("The application {string} POST the {string} pointScale payload to the /pointScales endpoint")
+    public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference,
+                                                                               String name) {
         try {
             checkCurrentApplication(applicationReference);
+
             pointScale.setName(name);
             lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
             processApiResponse(lastApiResponse);
@@ -365,7 +413,7 @@ public class BasicSteps {
             checkCurrentApplication(applicationReference);
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
-            lastReceivedBadge = (Badge) lastApiResponse.getData();
+            lastReceivedBadge = (BadgeResponse) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
@@ -401,7 +449,7 @@ public class BasicSteps {
             checkCurrentApplication(applicationReference);
             lastApiResponse = api.getPointScaleWithHttpInfo(id);
             processApiResponse(lastApiResponse);
-            lastReceivedPointScale = (PointScale) lastApiResponse.getData();
+            lastReceivedPointScale = (PointScaleResponse) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
@@ -447,6 +495,117 @@ public class BasicSteps {
 
 
     /*
+        ====  PATCH  ====
+    */
+
+    @When("The application {string} PATCH a badge with the id {int}")
+    public void theApplicationPATCHABadgeWithTheId(String applicationReference, int id) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value("test");
+
+            lastApiResponse = api.patchBadgeWithHttpInfo(id, Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+
+    }
+
+    @When("The application {string} PATCH a badge named {string}, he want to change the attribute {string} with the " +
+            "value {string}")
+    public void theApplicationPATCHABadgeNamedHeWantToChangeTheAttributeWithTheValue(String applicationReference,
+                                                                                     String badgeName,
+                                                                                     String attribute, String value) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<BadgeResponse>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<BadgeResponse> badges = getBadgeResponse.getData();
+            BadgeResponse target = null;
+            for (BadgeResponse badge : badges) {
+                if (badge.getName().equals(badgeName)) {
+                    target = badge;
+                    break;
+                }
+            }
+
+            String path = target.getLinks().get(0).getSelf().getPath();
+
+            String id = path.substring(path.lastIndexOf('/') + 1);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/" + attribute)
+                    .value(value);
+
+            lastApiResponse = api.patchBadgeWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} PATCH a point scale with the id {int}")
+    public void theApplicationPATCHAPointScaleWithTheId(String applicationReference, int id) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value("test");
+
+            lastApiResponse = api.patchPointScaleWithHttpInfo(id, Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} PATCH a point scale named {string}, he want to change the attribute {string} with" +
+            " the value {string}")
+    public void theApplicationPATCHAPointScaleNamedHeWantToChangeTheAttributeWithTheValue(String applicationReference,
+                                                                                          String pointScaleName,
+                                                                                          String attribute,
+                                                                                          String value) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<PointScaleResponse>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScaleResponse> pointScales = getPointScalesResponse.getData();
+            PointScaleResponse target = null;
+            for (PointScaleResponse pointScale : pointScales) {
+                if (pointScale.getName().equals(pointScaleName)) {
+                    target = pointScale;
+                    break;
+                }
+            }
+
+            String path = target.getLinks().get(0).getSelf().getPath();
+
+            String id = path.substring(path.lastIndexOf('/') + 1);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/" + attribute)
+                    .value(value);
+
+            lastApiResponse = api.patchPointScaleWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    /*
         ====  RECEPTION  ====
     */
 
@@ -456,13 +615,17 @@ public class BasicSteps {
     }
 
     @And("The application receives a payload that is the same as the badge payload")
-    public void theApplicationReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
-        assertEquals(badge, lastReceivedBadge);
+    public void theApplicationReceivesAPayloadThatIsTheSameAsTheBadgePayload() {
+        // Dont check links
+        assertEquals(badge.getName(), lastReceivedBadge.getName());
+        assertEquals(badge.getObtainedDate(), lastReceivedBadge.getObtainedDate());
+        assertEquals(badge.getImageUrl(), lastReceivedBadge.getImageUrl());
     }
 
     @And("The application receives a payload that is the same as the pointScale payload")
     public void theApplicationReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
-        assertEquals(pointScale, lastReceivedPointScale);
+        assertEquals(pointScale.getName(), lastReceivedPointScale.getName());
+        assertEquals(pointScale.getDescription(), lastReceivedPointScale.getDescription());
     }
 
     @And("The application receives a payload that is the same as the rule payload")
@@ -488,7 +651,7 @@ public class BasicSteps {
 
         try {
             checkCurrentApplication(applicationReference);
-            List<Badge> badges = api.getBadges();
+            List<BadgeResponse> badges = api.getBadges();
             assertEquals(size, badges.size());
         } catch (ApiException e) {
             processApiException(e);
@@ -500,7 +663,7 @@ public class BasicSteps {
 
         try {
             checkCurrentApplication(applicationReference);
-            List<PointScale> pointScales = api.getPointScales();
+            List<PointScaleResponse> pointScales = api.getPointScales();
             assertEquals(pointScales.size(), size);
         } catch (ApiException e) {
             processApiException(e);

@@ -48,10 +48,28 @@ Feature: Validation of badges implementation
   #
   # Check date of a badge (POST / GET with date check that it's the same day)
   #
-  Scenario:
+  Scenario: check date of a badge
     Given The application has a badge payload
     When The application "A1" POST the "Diamond" badge payload to the /badges endpoint
     Then The application receives a 201 status code
     When The application "A1" sends a GET to the badge URL in the location header
     Then The application receives a 200 status code
     And The application receives a badge that was created today
+
+  Scenario: update badge performs correctly
+    Given The application has a badge payload
+    When The application "A1" POST the "Platinum" badge payload to the /badges endpoint
+    Then The application receives a 201 status code
+    When The application "A1" PATCH a badge named "Platinum", he want to change the attribute "name" with the value "Wood"
+    Then The application receives a 200 status code
+    And The application "A1" contains a badge named "Wood" as "name" attribute
+
+  Scenario: update badge with a incorrect id
+    When The application "A1" PATCH a badge with the id 99
+    Then The application receives a 404 status code
+
+  Scenario: update a unknown attribute
+    Given The application has a badge payload
+    When The application "A1" POST the "Test" badge payload to the /badges endpoint
+    When The application "A1" PATCH a badge named "Test", he want to change the attribute "test" with the value "Bla"
+    Then The application receives a 400 status code

@@ -43,7 +43,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Badge'
+                  $ref: '#/components/schemas/BadgeResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /badges/{id}:
@@ -56,17 +56,41 @@ paths:
           schema:
             type: integer
           required: true
+          description: The id of a specific badge
       responses:
         '200':
           description: success
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Badge'
+                $ref: '#/components/schemas/BadgeResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           description: not found
+    patch:
+      description: Update a specific badge
+      operationId: patchBadge
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The id of a specific badge
+      requestBody:
+        required: true
+        content:
+          'application/json-patch+json':
+            schema:
+              $ref: '#/components/schemas/PatchBody'
+      responses:
+        '200':
+          description: success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Not found
   /pointScales:
     post:
       description: create a pointScale
@@ -103,7 +127,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PointScale'
+                  $ref: '#/components/schemas/PointScaleResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /pointScales/{id}:
@@ -122,11 +146,34 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/PointScale'
+                $ref: '#/components/schemas/PointScaleResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           description: not found
+    patch:
+      description: Update a specific pointScale
+      operationId: patchPointScale
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The id of a specific pointScale
+      requestBody:
+        required: true
+        content:
+          'application/json-patch+json':
+            schema:
+              $ref: '#/components/schemas/PatchBody'
+      responses:
+        '200':
+          description: success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Not found
   /registration:
     post:
       description: registrate application
@@ -279,6 +326,12 @@ components:
         WWW_Authenticate:
           schema:
             type: string
+  requestBodies:
+    patchBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PatchBody'
   schemas:
     PointScale:
       type: object
@@ -292,6 +345,15 @@ components:
       properties:
         msg:
           type: string
+    PointScaleResponse:
+      allOf:
+        - $ref: '#/components/schemas/PointScale'
+        - type: object
+          properties:
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/Link'
     Badge:
       type: object
       properties:
@@ -303,6 +365,15 @@ components:
         imageUrl:
           type: string
           nullable: true
+    BadgeResponse:
+      allOf:
+        - $ref: '#/components/schemas/Badge'
+        - type: object
+          properties:
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/Link'
     Event:
       type: object
       properties:
@@ -374,3 +445,32 @@ components:
         value:
           type: string
           format: uuid
+    Link:
+      type: object
+      properties:
+        self:
+          type: string
+          format: uri
+    # Reference https://stackoverflow.com/a/57511258/14447504
+    PatchBody:
+      type: array
+      items:
+        $ref: "#/components/schemas/JsonPatchDocument"
+    JsonPatchDocument:
+      type: object
+      description: A JSONPatch document as defined by RFC 6902
+      required:
+        - "op"
+        - "path"
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
+          enum:
+            - "replace"
+        path:
+          type: string
+          description: A JSON-Pointer
+        value:
+          type: object
+          description: The value to be used within the operations.
