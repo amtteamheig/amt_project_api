@@ -156,7 +156,11 @@ public class BadgesApiController implements BadgesApi {
     private BadgeEntity toBadgeEntity(Badge badge) throws ApiException {
         BadgeEntity entity = new BadgeEntity();
 
-        if(badge.getName().isEmpty()) {
+        if(badge == null){
+            throw new ApiException(400, "Body is empty");
+        }
+
+        if(badge.getName() == null || badge.getName().isEmpty()) {
             throw new ApiException(400, "Name is empty");
         }
 

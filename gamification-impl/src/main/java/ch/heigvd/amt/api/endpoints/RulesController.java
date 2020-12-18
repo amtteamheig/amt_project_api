@@ -117,19 +117,20 @@ public class RulesController implements RulesApi {
      */
     private RuleEntity toRuleEntity(Rule rule) throws ApiException {
 
-        if(rule.getIf().getType().isEmpty()) {
+        if(rule.getIf().getType() == null || rule.getIf().getType().isEmpty()) {
             throw new ApiException(400, "Type of If is empty");
         }
 
-        if(rule.getThen().getAwardBadge().toString().isEmpty()) {
+        if(rule.getThen().getAwardBadge() == null || rule.getThen().getAwardBadge().toString().isEmpty()) {
             throw new ApiException(400, "AwardBadge of Then is empty");
         }
 
-        if(rule.getThen().getAwardPoints().getPointScale().toString().isEmpty()) {
+        if(rule.getThen().getAwardPoints().getPointScale() == null ||
+                rule.getThen().getAwardPoints().getPointScale().toString().isEmpty()) {
             throw new ApiException(400, "PointScale of AwardPoints of Then is empty");
         }
 
-        if(rule.getThen().getAwardPoints().getAmount() == 0) {
+        if(rule.getThen().getAwardPoints().getAmount() == null || rule.getThen().getAwardPoints().getAmount() == 0) {
             throw new ApiException(400, "Amount of AwardPoints of Then = 0");
         }
 

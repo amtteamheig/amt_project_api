@@ -162,11 +162,15 @@ public class PointScalesApiController implements PointScalesApi {
     private PointScaleEntity toPointScaleEntity(PointScale pointScale) throws ApiException {
         PointScaleEntity entity = new PointScaleEntity();
 
-        if(pointScale.getName().isEmpty()) {
+        if(pointScale == null){
+            throw new ApiException(400, "Body is empty");
+        }
+
+        if(pointScale.getName() == null || pointScale.getName().isEmpty()) {
            throw new ApiException(400, "Name is empty");
         }
 
-        if(pointScale.getDescription().isEmpty()) {
+        if(pointScale.getDescription() == null || pointScale.getDescription().isEmpty()) {
             throw new ApiException(400, "Description is empty");
         }
 
@@ -202,7 +206,7 @@ public class PointScalesApiController implements PointScalesApi {
         Link self = new Link();
         String url = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" +
                 servletRequest.getServerPort();
-        self.self(new URI(url + "/badges/" + entity.getId()));
+        self.self(new URI(url + "/pointScales/" + entity.getId()));
         pointScaleResponse.setLinks(Collections.singletonList(self));
         return pointScaleResponse;
     }

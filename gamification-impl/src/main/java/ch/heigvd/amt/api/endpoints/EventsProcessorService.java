@@ -140,7 +140,7 @@ public class EventsProcessorService implements EventsApi {
             throw new ApiException(400, "Timestamp is null");
         }
 
-        if(event.getType().isEmpty()) {
+        if(event.getType() == null || event.getType().isEmpty()) {
             throw new ApiException(400, "Type is empty");
         }
     }
