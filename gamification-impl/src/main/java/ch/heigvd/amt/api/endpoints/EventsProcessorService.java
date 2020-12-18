@@ -1,6 +1,8 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.EventsApi;
+import ch.heigvd.amt.api.exceptions.ApiException;
+import ch.heigvd.amt.api.model.APIError;
 import ch.heigvd.amt.api.model.Event;
 import ch.heigvd.amt.api.model.User;
 import ch.heigvd.amt.entities.ApiKeyEntity;
@@ -11,6 +13,7 @@ import ch.heigvd.amt.entities.awards.PointScaleAwardEntity;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.RuleRepository;
 import ch.heigvd.amt.repositories.UserRepository;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,9 +58,10 @@ public class EventsProcessorService implements EventsApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        //make sure event user ID isn't null
-        if(event.getUserId() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User id missing");
+        try {
+            checkEvent(event);
+        }catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
 
         Optional<UserEntity> userInRep = userRepository.findByApiKeyEntityValue_AndId(apiKeyId, event.getUserId());
@@ -73,10 +77,11 @@ public class EventsProcessorService implements EventsApi {
         }
 
         //check rules
-        if(handleRules(event,user,apiKeyId)){
+        try {
+            handleRules(event,user,apiKeyId);
             userRepository.save(user);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find Rule with type " + event.getType());
+        } catch(ApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
 
         return ResponseEntity.ok().build();
@@ -88,7 +93,7 @@ public class EventsProcessorService implements EventsApi {
      * @param user current user
      * @return true if a rule with event type was found
      */
-    private boolean handleRules(Event event, UserEntity user, String apiKeyId){
+    private void handleRules(Event event, UserEntity user, String apiKeyId) throws ApiException{
 
         //TODO : Change reason for something else than the type of the rule
         //TODO : Check if badge and pointScale exists
@@ -97,7 +102,7 @@ public class EventsProcessorService implements EventsApi {
 
         //if no rules found with given type, return
         if(ruleInRep.isEmpty()){
-            return false;
+            throw new ApiException(400, "Cannot find Rule with type " + event.getType());
         }
 
         //init
@@ -119,8 +124,25 @@ public class EventsProcessorService implements EventsApi {
         //update user
         user.getBadgesAwards().add(badgeAwardEntity);
         user.getPointsAwards().add(pointScaleAwardEntity);
+    }
 
-        return true;
+    /**
+     * Check if the attributes of the event are correct
+     * @param event
+     * @throws ApiException
+     */
+    private void checkEvent(Event event) throws ApiException {
+        if(event.getUserId() == null) {
+            throw new ApiException(400, "UserID is null");
+        }
+
+        if(event.getTimestamp() == null) {
+            throw new ApiException(400, "Timestamp is null");
+        }
+
+        if(event.getType() == null || event.getType().isEmpty()) {
+            throw new ApiException(400, "Type is empty");
+        }
     }
 
 }

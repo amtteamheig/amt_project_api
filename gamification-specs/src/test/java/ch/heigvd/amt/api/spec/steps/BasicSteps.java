@@ -10,15 +10,22 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+
 import org.junit.Assert;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class BasicSteps {
 
@@ -39,8 +46,8 @@ public class BasicSteps {
     private ApiKey apiKey;
     private String lastReceivedLocationHeader;
 
-    private Badge lastReceivedBadge;
-    private PointScale lastReceivedPointScale;
+    private BadgeResponse lastReceivedBadge;
+    private PointScaleResponse lastReceivedPointScale;
     private User lastReceivedUser;
     private Rule lastReceivedRule;
 
@@ -84,6 +91,45 @@ public class BasicSteps {
 
         applicationUsers.get(applicationReference).put(userReference, user);
     }
+
+    @And("The application {string} contains a badge named {string} as {string} attribute")
+    public void theApplicationContainsABadgeNamedAsAttribute(String applicationReference, String value,
+                                                             String attribute) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<BadgeResponse>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<BadgeResponse> badges = getBadgeResponse.getData();
+
+            assertThat(badges, contains(
+                    hasProperty(attribute, is(value))
+            ));
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+
+    @And("The application {string} contains a point scale named {string} as {string} attribute")
+    public void theApplicationContainsAPointScaleNamedAsAttribute(String applicationReference, String value,
+                                                                  String attribute) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<PointScaleResponse>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScaleResponse> pointScales = getPointScalesResponse.getData();
+
+            assertThat(pointScales, contains(
+                    hasProperty(attribute, is(value))
+            ));
+
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+
+    }
+
 
     /*
         ====  PAYLOADS  ====
@@ -140,8 +186,8 @@ public class BasicSteps {
 
             // change api key if needed
             checkCurrentApplication(applicationReference);
-
             badge.setName(name);
+
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
@@ -149,19 +195,37 @@ public class BasicSteps {
         }
     }
 
-
-    @When("The application {string} POST the {string} pointScale payload to the \\/pointScales endpoint")
-    public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference, String name) {
+    @When("The application {string} POST the {string} date badge payload to the \\/badges endpoint")
+    public void theApplicationPOSTTheDateBadgePayloadToTheBadgesEndpoint(String applicationReference, String date)
+            throws Throwable {
         try {
+
+            // change api key if needed
             checkCurrentApplication(applicationReference);
-            pointScale.setName(name);
-            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
+
+            if(!date.isEmpty())
+                badge.setObtainedDate(LocalDate.parse(date));
+            else
+                badge.setObtainedDate(null);
+
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
             processApiException(e);
         }
     }
 
+    @When("The application {string} POST the {string} imageURL badge payload to the \\/badges endpoint")
+    public void theApplicationPOSTTheImageURLBadgePayloadToTheBadgesEndpoint(String applicationReference, String imageUrl) {
+        try {
+            checkCurrentApplication(applicationReference);
+            badge.setImageUrl(imageUrl);
+            lastApiResponse = api.createBadgeWithHttpInfo(badge);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
 
     @When("The application {string} POST the event payload to the /events endpoint")
     public void iPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference) throws Throwable {
@@ -174,11 +238,139 @@ public class BasicSteps {
         }
     }
 
+    @When("The application {string} POST the event {string} payload to the \\/events endpoint")
+    public void theApplicationPOSTTheEventPayloadToTheEventsEndpoint(String applicationReference, String type) {
+        try {
+            checkCurrentApplication(applicationReference);
+            event.setType(type);
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the event timestamp {string} payload to the \\/events endpoint")
+    public void theApplicationPOSTTheEventTimestampPayloadToTheEventsEndpoint(String applicationReference, String timestamp) {
+        try {
+            checkCurrentApplication(applicationReference);
+            if (timestamp.isEmpty())
+                event.setTimestamp(null);
+            else
+                event.setTimestamp(OffsetDateTime.parse(timestamp));
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the event userId {string} payload to the \\/events endpoint")
+    public void theApplicationPOSTTheEventUserIdPayloadToTheEventsEndpoint(String applicationReference, String userId) {
+        try {
+            checkCurrentApplication(applicationReference);
+            event.setUserId(userId);
+            lastApiResponse = api.eventProcessWithHttpInfo(event);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+
+    @When("The application {string} POST the {string} pointScale payload to the /pointScales endpoint")
+    public void theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(String applicationReference,
+                                                                               String name) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            pointScale.setName(name);
+            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @And("The application {string} POST the {string} description pointScale payload to the \\/pointScales endpoint")
+    public void theApplicationPOSTTheDescriptionPointScalePayloadToThePointScalesEndpoint(String applicationReference, String description) {
+        try {
+            checkCurrentApplication(applicationReference);
+            pointScale.setDescription(description);
+            lastApiResponse = api.createPointScaleWithHttpInfo(pointScale);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
     @When("The application {string} POST the {string} rule payload to the \\/rules endpoint")
     public void theApplicationPOSTTheRulePayloadToTheRulesEndpoint(String applicationReference, String ruleName) {
         try {
             checkCurrentApplication(applicationReference);
             rule.setIf(new RuleIf().type(ruleName));
+            lastApiResponse = api.createRuleWithHttpInfo(rule);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} awardBadge of then rule payload to the \\/rules endpoint")
+    public void theApplicationPOSTTheAwardBadgeOfThenRulePayloadToTheRulesEndpoint(String applicationReference, String awardBadge) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            rule.setThen(
+                    new RuleThen()
+                            .awardBadge(URI.create(awardBadge))
+                            .awardPoints(rule.getThen().getAwardPoints())
+            );
+
+            lastApiResponse = api.createRuleWithHttpInfo(rule);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {string} pointScale of awardPoints of then rule payload to the \\/rules endpoint")
+    public void theApplicationPOSTThePointScaleOfAwardPointsOfThenRulePayloadToTheRulesEndpoint(String applicationReference, String pointScale) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            URI createdURI = URI.create(pointScale);
+
+            rule.setThen(
+                    new RuleThen()
+                            .awardBadge(rule.getThen().getAwardBadge())
+                            .awardPoints(new RuleThenAwardPoints()
+                                    .pointScale(createdURI)
+                                    .amount(rule.getThen().getAwardPoints().getAmount())
+                            )
+            );
+
+            lastApiResponse = api.createRuleWithHttpInfo(rule);
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} POST the {int} amount of awardPoints of then rule payload to the \\/rules endpoint")
+    public void theApplicationPOSTTheAmountOfAwardPointsOfThenRulePayloadToTheRulesEndpoint(String applicationReference, int amount) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            rule.setThen(
+                    new RuleThen()
+                            .awardBadge(rule.getThen().getAwardBadge())
+                            .awardPoints(new RuleThenAwardPoints()
+                                    .pointScale(rule.getThen().getAwardPoints().getPointScale())
+                                    .amount(amount)
+                            )
+            );
+
             lastApiResponse = api.createRuleWithHttpInfo(rule);
             processApiResponse(lastApiResponse);
         } catch (ApiException e) {
@@ -221,7 +413,7 @@ public class BasicSteps {
             checkCurrentApplication(applicationReference);
             lastApiResponse = api.getBadgeWithHttpInfo(id);
             processApiResponse(lastApiResponse);
-            lastReceivedBadge = (Badge) lastApiResponse.getData();
+            lastReceivedBadge = (BadgeResponse) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
@@ -257,7 +449,7 @@ public class BasicSteps {
             checkCurrentApplication(applicationReference);
             lastApiResponse = api.getPointScaleWithHttpInfo(id);
             processApiResponse(lastApiResponse);
-            lastReceivedPointScale = (PointScale) lastApiResponse.getData();
+            lastReceivedPointScale = (PointScaleResponse) lastApiResponse.getData();
         } catch (ApiException e) {
             processApiException(e);
         }
@@ -303,6 +495,117 @@ public class BasicSteps {
 
 
     /*
+        ====  PATCH  ====
+    */
+
+    @When("The application {string} PATCH a badge with the id {int}")
+    public void theApplicationPATCHABadgeWithTheId(String applicationReference, int id) {
+        try {
+            checkCurrentApplication(applicationReference);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value("test");
+
+            lastApiResponse = api.patchBadgeWithHttpInfo(id, Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+
+    }
+
+    @When("The application {string} PATCH a badge named {string}, he want to change the attribute {string} with the " +
+            "value {string}")
+    public void theApplicationPATCHABadgeNamedHeWantToChangeTheAttributeWithTheValue(String applicationReference,
+                                                                                     String badgeName,
+                                                                                     String attribute, String value) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<BadgeResponse>> getBadgeResponse = api.getBadgesWithHttpInfo();
+            List<BadgeResponse> badges = getBadgeResponse.getData();
+            BadgeResponse target = null;
+            for (BadgeResponse badge : badges) {
+                if (badge.getName().equals(badgeName)) {
+                    target = badge;
+                    break;
+                }
+            }
+
+            String path = target.getLinks().get(0).getSelf().getPath();
+
+            String id = path.substring(path.lastIndexOf('/') + 1);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/" + attribute)
+                    .value(value);
+
+            lastApiResponse = api.patchBadgeWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} PATCH a point scale with the id {int}")
+    public void theApplicationPATCHAPointScaleWithTheId(String applicationReference, int id) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/name")
+                    .value("test");
+
+            lastApiResponse = api.patchPointScaleWithHttpInfo(id, Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    @When("The application {string} PATCH a point scale named {string}, he want to change the attribute {string} with" +
+            " the value {string}")
+    public void theApplicationPATCHAPointScaleNamedHeWantToChangeTheAttributeWithTheValue(String applicationReference,
+                                                                                          String pointScaleName,
+                                                                                          String attribute,
+                                                                                          String value) {
+
+        try {
+            checkCurrentApplication(applicationReference);
+
+            ApiResponse<List<PointScaleResponse>> getPointScalesResponse = api.getPointScalesWithHttpInfo();
+            List<PointScaleResponse> pointScales = getPointScalesResponse.getData();
+            PointScaleResponse target = null;
+            for (PointScaleResponse pointScale : pointScales) {
+                if (pointScale.getName().equals(pointScaleName)) {
+                    target = pointScale;
+                    break;
+                }
+            }
+
+            String path = target.getLinks().get(0).getSelf().getPath();
+
+            String id = path.substring(path.lastIndexOf('/') + 1);
+
+            JsonPatchDocument patchDocument = new JsonPatchDocument()
+                    .op(JsonPatchDocument.OpEnum.REPLACE)
+                    .path("/" + attribute)
+                    .value(value);
+
+            lastApiResponse = api.patchPointScaleWithHttpInfo(Integer.parseInt(id), Arrays.asList(patchDocument));
+            processApiResponse(lastApiResponse);
+        } catch (ApiException e) {
+            processApiException(e);
+        }
+    }
+
+    /*
         ====  RECEPTION  ====
     */
 
@@ -312,13 +615,17 @@ public class BasicSteps {
     }
 
     @And("The application receives a payload that is the same as the badge payload")
-    public void theApplicationReceiveAPayloadThatIsTheSameAsTheBadgePayload() {
-        assertEquals(badge, lastReceivedBadge);
+    public void theApplicationReceivesAPayloadThatIsTheSameAsTheBadgePayload() {
+        // Dont check links
+        assertEquals(badge.getName(), lastReceivedBadge.getName());
+        assertEquals(badge.getObtainedDate(), lastReceivedBadge.getObtainedDate());
+        assertEquals(badge.getImageUrl(), lastReceivedBadge.getImageUrl());
     }
 
     @And("The application receives a payload that is the same as the pointScale payload")
     public void theApplicationReceiveAPayloadThatIsTheSameAsThePointScalePayload() {
-        assertEquals(pointScale, lastReceivedPointScale);
+        assertEquals(pointScale.getName(), lastReceivedPointScale.getName());
+        assertEquals(pointScale.getDescription(), lastReceivedPointScale.getDescription());
     }
 
     @And("The application receives a payload that is the same as the rule payload")
@@ -344,7 +651,7 @@ public class BasicSteps {
 
         try {
             checkCurrentApplication(applicationReference);
-            List<Badge> badges = api.getBadges();
+            List<BadgeResponse> badges = api.getBadges();
             assertEquals(size, badges.size());
         } catch (ApiException e) {
             processApiException(e);
@@ -356,7 +663,7 @@ public class BasicSteps {
 
         try {
             checkCurrentApplication(applicationReference);
-            List<PointScale> pointScales = api.getPointScales();
+            List<PointScaleResponse> pointScales = api.getPointScales();
             assertEquals(pointScales.size(), size);
         } catch (ApiException e) {
             processApiException(e);
@@ -428,5 +735,4 @@ public class BasicSteps {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
-
 }

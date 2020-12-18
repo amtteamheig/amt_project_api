@@ -1,4 +1,4 @@
-Feature: Check server is running
+Feature: Validation of pointScale implementation
 
   Background:
     Given there is a Gamification server
@@ -26,3 +26,33 @@ Feature: Check server is running
     And The application "A2" POST the "Bronze Rank" pointScale payload to the /pointScales endpoint
     Then The application "A1" GET to the /pointScales endpoint receive a list containing 2 pointScale(s)
     And The application "A2" GET to the /pointScales endpoint receive a list containing 1 pointScale(s)
+
+  Scenario: update point scale performs correctly
+    Given The application has a pointScale payload
+    When The application "A1" POST the "Platinum Rank" pointScale payload to the /pointScales endpoint
+    Then The application receives a 201 status code
+    When The application "A1" PATCH a point scale named "Platinum Rank", he want to change the attribute "name" with the value "Wood Rank"
+    Then The application receives a 200 status code
+    And The application "A1" contains a point scale named "Wood Rank" as "name" attribute
+
+
+  Scenario: update point scale with a incorrect id
+    When The application "A1" PATCH a point scale with the id 99
+    Then The application receives a 404 status code
+
+  Scenario: update a unknown attribute
+    Given The application has a pointScale payload
+    When The application "A1" POST the "Test Rank" pointScale payload to the /pointScales endpoint
+    When The application "A1" PATCH a point scale named "Test Rank", he want to change the attribute "test" with the value "Bla"
+    Then The application receives a 400 status code
+
+
+
+  #
+  # Create a point scale (POST) with bad attributes
+  Scenario: the API should return a 400 status code when the attributes are incorrect
+    Given The application has a pointScale payload
+    When The application "A1" POST the "" pointScale payload to the /pointScales endpoint
+    Then The application receives a 400 status code
+    And The application "A1" POST the "" description pointScale payload to the /pointScales endpoint
+    Then The application receives a 400 status code
