@@ -1,6 +1,7 @@
 package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.BadgesApi;
+import ch.heigvd.amt.api.exceptions.ApiException;
 import ch.heigvd.amt.api.model.BadgeResponse;
 import ch.heigvd.amt.api.model.JsonPatchDocument;
 import ch.heigvd.amt.api.model.Link;
