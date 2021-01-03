@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface PointScaleAwardRepository extends JpaRepository<PointScaleAwardEntity, Long> {
     Optional<List<PointScaleAwardEntity>> findByUser(UserEntity user);
-
+/*
     @Query(value = "SELECT User, SUM(ps.amount) as totalPoints FROM PointScaleAward ps " +
             "INNER JOIN User ON User.id = ps.fk_user " +
             "WHERE User.fk_apikey = ?1 " +
@@ -20,13 +20,9 @@ public interface PointScaleAwardRepository extends JpaRepository<PointScaleAward
             "ORDER BY totalPoints DESC " +
             "LIMIT ?3",
             nativeQuery = true)
-    List<Object[]> getLeaderBoard(String apiKey, Integer id, Integer limit);
-
-    /*
-    @Query(value = "SELECT User, SUM(ps.amount) as totalPoints FROM PointScaleAward ps " +
-                    "INNER JOIN User ON User.id = ps.fk_user " +
-                    "WHERE User.fk_apikey = ?1 " +
-                    "AND ps.id = ?2 " +
-                    "ORDER BY totalPoints DESC")
     List<Object[]> getLeaderBoard(String apiKey, Integer id, Integer limit);*/
+
+    @Query(value = "SELECT * FROM PointScaleAward",
+            nativeQuery = true)
+    List<Object[]> getLeaderBoard(String apiKey, Integer id, Integer limit);
 }
