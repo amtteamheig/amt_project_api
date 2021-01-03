@@ -10,9 +10,7 @@ import ch.heigvd.amt.entities.RuleEntity;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.entities.awards.BadgeAwardEntity;
 import ch.heigvd.amt.entities.awards.PointScaleAwardEntity;
-import ch.heigvd.amt.repositories.ApiKeyRepository;
-import ch.heigvd.amt.repositories.RuleRepository;
-import ch.heigvd.amt.repositories.UserRepository;
+import ch.heigvd.amt.repositories.*;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +32,12 @@ public class EventsProcessorService implements EventsApi {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    BadgeAwardRepository badgeAwardRepository;
+
+    @Autowired
+    PointScaleAwardRepository pointScaleAwardRepository;
 
     @Autowired
     ApiKeyRepository apiKeyRepository;
@@ -79,7 +83,6 @@ public class EventsProcessorService implements EventsApi {
         //check rules
         try {
             handleRules(event,user,apiKeyId);
-            userRepository.save(user);
         } catch(ApiException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
@@ -112,15 +115,17 @@ public class EventsProcessorService implements EventsApi {
         pointScaleAwardEntity.setReason(rule.get_if().getType());
         pointScaleAwardEntity.setTimestamp(event.getTimestamp());
         pointScaleAwardEntity.setAmount(rule.get_then().getAwardPoints().getAmount());
+        pointScaleAwardEntity.setUser(user);
 
         //set badge award
         badgeAwardEntity.setPath(rule.get_then().getAwardBadge());
         badgeAwardEntity.setReason(rule.get_if().getType());
         badgeAwardEntity.setTimestamp(event.getTimestamp());
+        badgeAwardEntity.setUser(user);
 
-        //update user
-        user.getBadgesAwards().add(badgeAwardEntity);
-        user.getPointsAwards().add(pointScaleAwardEntity);
+        //save in repos
+        pointScaleAwardRepository.save(pointScaleAwardEntity);
+        badgeAwardRepository.save(badgeAwardEntity);
     }
 
     /**

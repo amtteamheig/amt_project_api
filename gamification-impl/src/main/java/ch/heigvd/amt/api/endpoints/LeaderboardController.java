@@ -2,12 +2,14 @@ package ch.heigvd.amt.api.endpoints;
 
 import ch.heigvd.amt.api.LeaderboardsApi;
 
+import ch.heigvd.amt.api.model.PointScaleAward;
 import ch.heigvd.amt.api.model.PointScaleLeaderboard;
 import ch.heigvd.amt.api.model.PointScaleLeaderboardLeaderboard;
 import ch.heigvd.amt.api.model.User;
 import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
+import ch.heigvd.amt.repositories.PointScaleAwardRepository;
 import ch.heigvd.amt.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,7 @@ import java.util.List;
 public class LeaderboardController implements LeaderboardsApi {
 
     @Autowired
-    UserRepository userRepository;
+    PointScaleAwardRepository pointScaleAwardRepository;
 
     @Autowired
     ApiKeyRepository apiKeyRepository;
@@ -43,16 +45,16 @@ public class LeaderboardController implements LeaderboardsApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        List<UserEntity> usersInRepository = userRepository.getPointScaleLeaderBoard(apiKey.getValue(),id,limit)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        //List<UserEntity> usersInRepository = pointScaleAwardRepository.getLeaderBoard(apiKey.getValue(),id,limit);
 
         List<PointScaleLeaderboardLeaderboard> users = new ArrayList<>();
+        /*
         for(UserEntity userEntity : usersInRepository){
             PointScaleLeaderboardLeaderboard psll = new PointScaleLeaderboardLeaderboard();
             psll.setTotalPoints(5);
             psll.setUserId(userEntity.getId());
             users.add(psll);
-        }
+        }*/
 
         PointScaleLeaderboard psl = new PointScaleLeaderboard();
         psl.setName("name");
