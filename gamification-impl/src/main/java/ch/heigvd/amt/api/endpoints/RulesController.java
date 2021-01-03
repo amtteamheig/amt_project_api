@@ -10,6 +10,8 @@ import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.RuleEntity;
 import ch.heigvd.amt.api.model.Rule;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
+import ch.heigvd.amt.repositories.BadgeRepository;
+import ch.heigvd.amt.repositories.PointScaleRepository;
 import ch.heigvd.amt.repositories.RuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,14 @@ public class RulesController implements RulesApi {
     @Autowired
     ServletRequest servletRequest;
 
+    @Autowired
+    BadgeRepository badgeRepository;
+
+    @Autowired
+    PointScaleRepository pointScaleRepository;
+
+    String apiKeyId;
+
     /**
      * Servlet entry point POST /rules
      * @param rule rule object built by the user
@@ -47,7 +57,7 @@ public class RulesController implements RulesApi {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createRule(@Valid Rule rule) {
 
-        String apiKeyId = (String) servletRequest.getAttribute("Application");
+        apiKeyId = (String) servletRequest.getAttribute("Application");
 
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -133,6 +143,26 @@ public class RulesController implements RulesApi {
         if(rule.getThen().getAwardPoints().getAmount() == null || rule.getThen().getAwardPoints().getAmount() == 0) {
             throw new ApiException(400, "Amount of AwardPoints of Then = 0");
         }
+
+        String badgeUri = rule.getThen().getAwardBadge().toString();
+        String pointScaleUri = rule.getThen().getAwardPoints().getPointScale().toString();
+
+        if(!badgeUri.startsWith("/badges/")){
+            throw new ApiException(400, "Invalid Uri format for badges");
+        }
+
+        if(!pointScaleUri.startsWith("/pointScales/")){
+            throw new ApiException(400, "Invalid Uri format for pointScales");
+        }
+
+        Long badgeID = Long.parseLong(badgeUri.substring("/badges/".length()));
+        Long pointScaleID = Long.parseLong(pointScaleUri.substring("/pointScales/".length()));
+
+        badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId,badgeID)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Badge does not exist"));
+
+        pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId,pointScaleID)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"PointScale does not exist"));
 
         return RuleEntity.builder()
                 ._if(RuleEntity.If.builder()

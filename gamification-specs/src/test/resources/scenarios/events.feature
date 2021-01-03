@@ -24,9 +24,10 @@ Feature: Event processing
 
   Scenario: send an event with a rule specified
     Given The application has a "rule1" event payload
-    Given The application has a rule payload
+    Given The application "A1" has a rule payload
     When The application "A1" POST the "rule1" rule payload to the /rules endpoint
     Then The application receives a 201 status code
+    Given The application "A2" has a rule payload
     When The application "A2" POST the event payload to the /events endpoint
     Then The application receives a 400 status code
     When The application "A1" POST the event payload to the /events endpoint

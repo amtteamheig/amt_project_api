@@ -60,7 +60,7 @@ public class EventsProcessorService implements EventsApi {
 
         try {
             checkEvent(event);
-        }catch(ApiException e) {
+        } catch(ApiException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
 
@@ -94,9 +94,6 @@ public class EventsProcessorService implements EventsApi {
      * @return true if a rule with event type was found
      */
     private void handleRules(Event event, UserEntity user, String apiKeyId) throws ApiException{
-
-        //TODO : Change reason for something else than the type of the rule
-        //TODO : Check if badge and pointScale exists
 
         Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(event.getType(),apiKeyId);
 
