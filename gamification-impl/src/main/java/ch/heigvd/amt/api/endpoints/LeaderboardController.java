@@ -34,7 +34,7 @@ public class LeaderboardController implements LeaderboardsApi {
     ServletRequest servletRequest;
 
     @Override
-    public ResponseEntity<List<PointScaleLeaderboard>> getLeaderboards(Integer limit) {
+    public ResponseEntity<List<PointScaleLeaderboard>> getPointScalesLeaderboards(Integer limit) {
         return null;
     }
 
@@ -45,7 +45,7 @@ public class LeaderboardController implements LeaderboardsApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        //List<UserEntity> usersInRepository = pointScaleAwardRepository.getLeaderBoard(apiKey.getValue(),id,limit);
+        List<Object[]> usersInRepository = pointScaleAwardRepository.getLeaderBoard(apiKey.getValue(),id,limit);
 
         List<PointScaleLeaderboardLeaderboard> users = new ArrayList<>();
         /*

@@ -311,7 +311,7 @@ paths:
   /leaderboards/pointScales/{limit}:
     get:
       description: get all the leaderboards
-      operationId: getLeaderboards
+      operationId: getPointScalesLeaderboards
       parameters:
         - in: path
           name: limit
@@ -329,7 +329,7 @@ paths:
                   $ref: '#/components/schemas/PointScaleLeaderboard'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /leaderboards/pointScales/{id}/{limit}:
+  /leaderboards/pointScales/{limit}/{id}:
     get:
       description: get one leaderboard, by pointScale id
       operationId: getPointScaleLeaderboard
@@ -407,9 +407,6 @@ components:
       properties:
         name:
           type: string
-        obtainedDate:
-          type: string
-          format: date
         imageUrl:
           type: string
           nullable: true

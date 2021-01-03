@@ -19,7 +19,7 @@ public abstract class AwardEntity {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "fk_apikey")
+    @JoinColumn(name = "fk_user")
     private UserEntity user;
 
     private String reason;
