@@ -407,9 +407,6 @@ components:
       properties:
         name:
           type: string
-        obtainedDate:
-          type: string
-          format: date
         imageUrl:
           type: string
           nullable: true

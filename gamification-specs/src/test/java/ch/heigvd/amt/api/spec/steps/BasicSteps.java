@@ -139,7 +139,6 @@ public class BasicSteps {
     public void iHaveABadgePayload() throws Throwable {
         badge = new ch.heigvd.amt.api.dto.Badge()
                 .name("Diamond")
-                .obtainedDate(LocalDate.now())
                 .imageUrl(
                         "https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo" +
                                 "-diamond-classic-cut.jpg");
@@ -202,11 +201,6 @@ public class BasicSteps {
 
             // change api key if needed
             checkCurrentApplication(applicationReference);
-
-            if(!date.isEmpty())
-                badge.setObtainedDate(LocalDate.parse(date));
-            else
-                badge.setObtainedDate(null);
 
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
@@ -618,7 +612,6 @@ public class BasicSteps {
     public void theApplicationReceivesAPayloadThatIsTheSameAsTheBadgePayload() {
         // Dont check links
         assertEquals(badge.getName(), lastReceivedBadge.getName());
-        assertEquals(badge.getObtainedDate(), lastReceivedBadge.getObtainedDate());
         assertEquals(badge.getImageUrl(), lastReceivedBadge.getImageUrl());
     }
 
@@ -679,11 +672,6 @@ public class BasicSteps {
         } catch (ApiException e) {
             processApiException(e);
         }
-    }
-
-    @And("The application receives a badge that was created today")
-    public void theApplicationReceiveABadgeThatWasCreatedToday() {
-        assertEquals(badge.getObtainedDate(), LocalDate.now());
     }
 
     @And("The application receives {int} users")
