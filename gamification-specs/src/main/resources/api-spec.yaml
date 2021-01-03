@@ -308,7 +308,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           description: not found
-  /leaderboards/{limit}:
+  /leaderboards/pointScales/{limit}:
     get:
       description: get all the leaderboards
       operationId: getLeaderboards
@@ -407,6 +407,9 @@ components:
       properties:
         name:
           type: string
+        obtainedDate:
+          type: string
+          format: date
         imageUrl:
           type: string
           nullable: true
