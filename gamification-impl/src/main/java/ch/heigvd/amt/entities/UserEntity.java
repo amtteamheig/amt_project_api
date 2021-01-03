@@ -30,5 +30,4 @@ public class UserEntity {
     @OneToMany(cascade = {CascadeType.ALL})
     private List<PointScaleAwardEntity> pointsAwards = new ArrayList<>();
 
-
 }

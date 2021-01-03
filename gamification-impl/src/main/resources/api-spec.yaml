@@ -463,7 +463,7 @@ components:
         pointsAwards:
           type: array
           items:
-            $ref: '#/components/schemas/PointscaleAward'
+            $ref: '#/components/schemas/PointScaleAward'
     Award:
       type: object
       properties:
@@ -478,7 +478,7 @@ components:
     BadgeAward:
       allOf:
         - $ref: '#/components/schemas/Award'
-    PointscaleAward:
+    PointScaleAward:
       allOf:
         - $ref: '#/components/schemas/Award'
       properties:

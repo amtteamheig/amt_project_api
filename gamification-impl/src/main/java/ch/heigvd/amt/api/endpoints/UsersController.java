@@ -87,7 +87,7 @@ public class UsersController implements UsersApi {
         }).collect(Collectors.toList()));
 
         user.setPointsAwards(entity.getPointsAwards().stream().map(pointsAwardEntity -> {
-            PointscaleAward pointscaleAward = new PointscaleAward();
+            PointScaleAward pointscaleAward = new PointScaleAward();
             pointscaleAward.setAmount(pointsAwardEntity.getAmount());
             pointscaleAward.setPath(URI.create(pointsAwardEntity.getPath()));
             pointscaleAward.setReason(pointsAwardEntity.getReason());
