@@ -126,6 +126,8 @@ public class RulesController implements RulesApi {
      * @return rule entity
      */
     private RuleEntity toRuleEntity(Rule rule) throws ApiException {
+        
+        //check given rule, see if fields are there
 
         if(rule.getIf().getType() == null || rule.getIf().getType().isEmpty()) {
             throw new ApiException(400, "Type of If is empty");
@@ -144,6 +146,8 @@ public class RulesController implements RulesApi {
             throw new ApiException(400, "Amount of AwardPoints of Then = 0");
         }
 
+        //checks on URIs, see if they are correct
+
         String badgeUri = rule.getThen().getAwardBadge().toString();
         String pointScaleUri = rule.getThen().getAwardPoints().getPointScale().toString();
 
@@ -155,6 +159,8 @@ public class RulesController implements RulesApi {
             throw new ApiException(400, "Invalid Uri format for pointScales");
         }
 
+        //checks on URIs, see if they exist for current application
+
         Long badgeID = Long.parseLong(badgeUri.substring("/badges/".length()));
         Long pointScaleID = Long.parseLong(pointScaleUri.substring("/pointScales/".length()));
 
@@ -163,6 +169,8 @@ public class RulesController implements RulesApi {
 
         pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId,pointScaleID)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"PointScale does not exist"));
+
+        //creating rule
 
         return RuleEntity.builder()
                 ._if(RuleEntity.If.builder()
