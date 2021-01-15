@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Data
+@Table(name = "Badge")
 public class BadgeEntity {
 
     @Id

@@ -164,12 +164,7 @@ public class BadgesApiController implements BadgesApi {
             throw new ApiException(400, "Name is empty");
         }
 
-        if(badge.getObtainedDate() == null) {
-            throw new ApiException(400, "Obtained date is empty");
-        }
-
         entity.setName(badge.getName());
-        entity.setObtainedDate(badge.getObtainedDate());
         entity.setImageUrl(badge.getImageUrl());
         return entity;
     }
@@ -182,7 +177,6 @@ public class BadgesApiController implements BadgesApi {
     private Badge toBadge(BadgeEntity entity) {
         Badge badge = new Badge();
         badge.setName(entity.getName());
-        badge.setObtainedDate(entity.getObtainedDate());
         badge.setImageUrl(entity.getImageUrl());
         return badge;
     }
@@ -197,7 +191,6 @@ public class BadgesApiController implements BadgesApi {
     private BadgeResponse toBadgeResponse(BadgeEntity entity) throws URISyntaxException {
         BadgeResponse badgeResponse = new BadgeResponse();
         badgeResponse.setName(entity.getName());
-        badgeResponse.setObtainedDate(entity.getObtainedDate());
         badgeResponse.setImageUrl(entity.getImageUrl());
         Link self = new Link();
         String url = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" +

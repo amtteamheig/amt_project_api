@@ -22,9 +22,6 @@ Feature: Validation of badges implementation
     Given The application has a badge payload
     When The application "A1" POST the "" badge payload to the /badges endpoint
     Then The application receives a 400 status code
-    Given The application has a badge payload
-    And The application "A1" POST the "" date badge payload to the /badges endpoint
-    Then The application receives a 400 status code
 
   #
   # Create a badge (POST) with imageURL is empty
@@ -46,16 +43,8 @@ Feature: Validation of badges implementation
     And The application "A2" GET to the /badges endpoint receive a list containing 1 badge(s)
 
   #
-  # Check date of a badge (POST / GET with date check that it's the same day)
+  # Update badges
   #
-  Scenario: check date of a badge
-    Given The application has a badge payload
-    When The application "A1" POST the "Diamond" badge payload to the /badges endpoint
-    Then The application receives a 201 status code
-    When The application "A1" sends a GET to the badge URL in the location header
-    Then The application receives a 200 status code
-    And The application receives a badge that was created today
-
   Scenario: update badge performs correctly
     Given The application has a badge payload
     When The application "A1" POST the "Platinum" badge payload to the /badges endpoint

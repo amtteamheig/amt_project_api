@@ -10,6 +10,8 @@ import ch.heigvd.amt.entities.ApiKeyEntity;
 import ch.heigvd.amt.entities.RuleEntity;
 import ch.heigvd.amt.api.model.Rule;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
+import ch.heigvd.amt.repositories.BadgeRepository;
+import ch.heigvd.amt.repositories.PointScaleRepository;
 import ch.heigvd.amt.repositories.RuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,14 @@ public class RulesController implements RulesApi {
     @Autowired
     ServletRequest servletRequest;
 
+    @Autowired
+    BadgeRepository badgeRepository;
+
+    @Autowired
+    PointScaleRepository pointScaleRepository;
+
+    String apiKeyId;
+
     /**
      * Servlet entry point POST /rules
      * @param rule rule object built by the user
@@ -47,16 +57,19 @@ public class RulesController implements RulesApi {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createRule(@Valid Rule rule) {
 
-        String apiKeyId = (String) servletRequest.getAttribute("Application");
+        apiKeyId = (String) servletRequest.getAttribute("Application");
 
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         //check if rule with this type already exists
-        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(rule.getIf().getType(),apiKeyId);
-
-        if(ruleInRep.isPresent()){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Rule with given type already exists");
+        try {
+            Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(rule.getIf().getType(), apiKeyId);
+            if(ruleInRep.isPresent()){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Rule with given type already exists");
+            }
+        } catch (NullPointerException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -117,6 +130,8 @@ public class RulesController implements RulesApi {
      */
     private RuleEntity toRuleEntity(Rule rule) throws ApiException {
 
+        //check given rule, see if fields are there
+
         if(rule.getIf().getType() == null || rule.getIf().getType().isEmpty()) {
             throw new ApiException(400, "Type of If is empty");
         }
@@ -133,6 +148,35 @@ public class RulesController implements RulesApi {
         if(rule.getThen().getAwardPoints().getAmount() == null || rule.getThen().getAwardPoints().getAmount() == 0) {
             throw new ApiException(400, "Amount of AwardPoints of Then = 0");
         }
+
+        //checks on URIs, see if they are correct
+
+        String badgeUri = rule.getThen().getAwardBadge().toString();
+        String pointScaleUri = rule.getThen().getAwardPoints().getPointScale().toString();
+
+        if(!badgeUri.startsWith("/badges/")){
+            throw new ApiException(400, "Invalid Uri format for badges");
+        }
+
+        if(!pointScaleUri.startsWith("/pointScales/")){
+            throw new ApiException(400, "Invalid Uri format for pointScales");
+        }
+
+        //checks on URIs, see if they exist for current application
+        try {
+            Long badgeID = Long.parseLong(badgeUri.substring("/badges/".length()));
+            Long pointScaleID = Long.parseLong(pointScaleUri.substring("/pointScales/".length()));
+
+            badgeRepository.findByApiKeyEntityValue_AndId(apiKeyId,badgeID)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Badge does not exist"));
+
+            pointScaleRepository.findByApiKeyEntityValue_AndId(apiKeyId,pointScaleID)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"PointScale does not exist"));
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        }
+
+        //creating rule
 
         return RuleEntity.builder()
                 ._if(RuleEntity.If.builder()

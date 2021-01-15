@@ -139,7 +139,6 @@ public class BasicSteps {
     public void iHaveABadgePayload() throws Throwable {
         badge = new ch.heigvd.amt.api.dto.Badge()
                 .name("Diamond")
-                .obtainedDate(LocalDate.now())
                 .imageUrl(
                         "https://st2.depositphotos.com/1000393/10030/i/600/depositphotos_100308166-stock-photo" +
                                 "-diamond-classic-cut.jpg");
@@ -161,16 +160,26 @@ public class BasicSteps {
                 .userId(user.getId());
     }
 
-    @Given("The application has a rule payload")
-    public void theApplicationHasARulePayload() {
+    @Given("The application {string} has a rule payload")
+    public void theApplicationHasARulePayload(String applicationReference) throws Throwable {
+
         lastRuleType = generateRandomNewString();
+
+        iHaveABadgePayload();
+        theApplicationPOSTTheBadgePayloadToTheBadgesEndpoint(applicationReference, "badge");
+        String badgeLocation = lastReceivedLocationHeader.substring("http://localhost:XXXX".length());
+
+        iHaveAPointScalePayload();
+        theApplicationPOSTThePointScalePayloadToThePointScalesEndpoint(applicationReference, "pointScale");
+        String pointScaleLocation = lastReceivedLocationHeader.substring("http://localhost:XXXX".length());
+
         rule = new ch.heigvd.amt.api.dto.Rule()
                 ._if(new RuleIf().type(lastRuleType))
                 .then(new RuleThen()
-                        .awardBadge(URI.create("badges/1"))
+                        .awardBadge(URI.create(badgeLocation))
                         .awardPoints(new RuleThenAwardPoints()
                             .amount(1)
-                            .pointScale(URI.create("pointScales/1"))
+                            .pointScale(URI.create(pointScaleLocation))
                         )
                 );
     }
@@ -202,11 +211,6 @@ public class BasicSteps {
 
             // change api key if needed
             checkCurrentApplication(applicationReference);
-
-            if(!date.isEmpty())
-                badge.setObtainedDate(LocalDate.parse(date));
-            else
-                badge.setObtainedDate(null);
 
             lastApiResponse = api.createBadgeWithHttpInfo(badge);
             processApiResponse(lastApiResponse);
@@ -618,7 +622,6 @@ public class BasicSteps {
     public void theApplicationReceivesAPayloadThatIsTheSameAsTheBadgePayload() {
         // Dont check links
         assertEquals(badge.getName(), lastReceivedBadge.getName());
-        assertEquals(badge.getObtainedDate(), lastReceivedBadge.getObtainedDate());
         assertEquals(badge.getImageUrl(), lastReceivedBadge.getImageUrl());
     }
 
@@ -675,15 +678,10 @@ public class BasicSteps {
         try {
             checkCurrentApplication(applicationReference);
             List<Rule> rules = api.getRules();
-            assertEquals(rules.size(), size);
+            assertEquals(size, rules.size());
         } catch (ApiException e) {
             processApiException(e);
         }
-    }
-
-    @And("The application receives a badge that was created today")
-    public void theApplicationReceiveABadgeThatWasCreatedToday() {
-        assertEquals(badge.getObtainedDate(), LocalDate.now());
     }
 
     @And("The application receives {int} users")

@@ -10,9 +10,7 @@ import ch.heigvd.amt.entities.RuleEntity;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.entities.awards.BadgeAwardEntity;
 import ch.heigvd.amt.entities.awards.PointScaleAwardEntity;
-import ch.heigvd.amt.repositories.ApiKeyRepository;
-import ch.heigvd.amt.repositories.RuleRepository;
-import ch.heigvd.amt.repositories.UserRepository;
+import ch.heigvd.amt.repositories.*;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +32,12 @@ public class EventsProcessorService implements EventsApi {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    BadgeAwardRepository badgeAwardRepository;
+
+    @Autowired
+    PointScaleAwardRepository pointScaleAwardRepository;
 
     @Autowired
     ApiKeyRepository apiKeyRepository;
@@ -60,7 +64,7 @@ public class EventsProcessorService implements EventsApi {
 
         try {
             checkEvent(event);
-        }catch(ApiException e) {
+        } catch(ApiException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
 
@@ -78,8 +82,7 @@ public class EventsProcessorService implements EventsApi {
 
         //check rules
         try {
-            handleRules(event,user,apiKeyId);
-            userRepository.save(user);
+            handleRules(event,user,apiKey);
         } catch(ApiException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
@@ -93,12 +96,9 @@ public class EventsProcessorService implements EventsApi {
      * @param user current user
      * @return true if a rule with event type was found
      */
-    private void handleRules(Event event, UserEntity user, String apiKeyId) throws ApiException{
+    private void handleRules(Event event, UserEntity user, ApiKeyEntity apiKey) throws ApiException{
 
-        //TODO : Change reason for something else than the type of the rule
-        //TODO : Check if badge and pointScale exists
-
-        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(event.getType(),apiKeyId);
+        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(event.getType(),apiKey.getValue());
 
         //if no rules found with given type, return
         if(ruleInRep.isEmpty()){
@@ -115,15 +115,19 @@ public class EventsProcessorService implements EventsApi {
         pointScaleAwardEntity.setReason(rule.get_if().getType());
         pointScaleAwardEntity.setTimestamp(event.getTimestamp());
         pointScaleAwardEntity.setAmount(rule.get_then().getAwardPoints().getAmount());
+        pointScaleAwardEntity.setUser(user);
+        pointScaleAwardEntity.setApiKeyEntity(apiKey);
 
         //set badge award
         badgeAwardEntity.setPath(rule.get_then().getAwardBadge());
         badgeAwardEntity.setReason(rule.get_if().getType());
         badgeAwardEntity.setTimestamp(event.getTimestamp());
+        badgeAwardEntity.setUser(user);
+        badgeAwardEntity.setApiKeyEntity(apiKey);
 
-        //update user
-        user.getBadgesAwards().add(badgeAwardEntity);
-        user.getPointsAwards().add(pointScaleAwardEntity);
+        //save in repos
+        pointScaleAwardRepository.save(pointScaleAwardEntity);
+        badgeAwardRepository.save(badgeAwardEntity);
     }
 
     /**

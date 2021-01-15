@@ -6,13 +6,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Data
+@Table(name = "PointScaleAward")
 public class PointScaleAwardEntity extends AwardEntity {
     private int amount;
 }
+
+
+
