@@ -7,9 +7,12 @@ import ch.heigvd.amt.api.model.PointScaleLeaderboard;
 import ch.heigvd.amt.api.model.PointScaleLeaderboardLeaderboard;
 import ch.heigvd.amt.api.model.User;
 import ch.heigvd.amt.entities.ApiKeyEntity;
+import ch.heigvd.amt.entities.DTOs.LeaderboardDTO;
+import ch.heigvd.amt.entities.PointScaleEntity;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.repositories.ApiKeyRepository;
 import ch.heigvd.amt.repositories.PointScaleAwardRepository;
+import ch.heigvd.amt.repositories.PointScaleRepository;
 import ch.heigvd.amt.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,9 @@ public class LeaderboardController implements LeaderboardsApi {
 
     @Autowired
     PointScaleAwardRepository pointScaleAwardRepository;
+
+    @Autowired
+    PointScaleRepository pointScaleRepository;
 
     @Autowired
     ApiKeyRepository apiKeyRepository;
@@ -45,19 +51,22 @@ public class LeaderboardController implements LeaderboardsApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        List<Object[]> usersInRepository = pointScaleAwardRepository.getLeaderBoard(apiKey.getValue(),id,limit);
+        PointScaleEntity pointScaleEntity = pointScaleRepository.findByApiKeyEntityValue_AndId(apiKey.getValue(), (long) id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "no pointScale with that ID"));
+
+        List<LeaderboardDTO> leaderBoards = pointScaleAwardRepository.getLeaderBoard(id,limit);
 
         List<PointScaleLeaderboardLeaderboard> users = new ArrayList<>();
-        /*
-        for(UserEntity userEntity : usersInRepository){
+
+        for(LeaderboardDTO leaderboard : leaderBoards){
             PointScaleLeaderboardLeaderboard psll = new PointScaleLeaderboardLeaderboard();
-            psll.setTotalPoints(5);
-            psll.setUserId(userEntity.getId());
+            psll.setUserId(leaderboard.getUserID());
+            psll.setTotalPoints(leaderboard.getPoints());
             users.add(psll);
-        }*/
+        }
 
         PointScaleLeaderboard psl = new PointScaleLeaderboard();
-        psl.setName("name");
+        psl.setName(pointScaleEntity.getName());
         psl.setLeaderboard(users);
 
         return ResponseEntity.ok(psl);

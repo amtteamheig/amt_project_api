@@ -1,6 +1,7 @@
 package ch.heigvd.amt.repositories;
 
 import ch.heigvd.amt.entities.BadgeEntity;
+import ch.heigvd.amt.entities.DTOs.LeaderboardDTO;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.entities.awards.BadgeAwardEntity;
 import ch.heigvd.amt.entities.awards.PointScaleAwardEntity;
@@ -22,7 +23,12 @@ public interface PointScaleAwardRepository extends JpaRepository<PointScaleAward
             nativeQuery = true)
     List<Object[]> getLeaderBoard(String apiKey, Integer id, Integer limit);*/
 
-    @Query(value = "SELECT * FROM PointScaleAward",
+    @Query(value = "SELECT user.id as userID, SUM(ae.amount) AS points FROM award_entity AS ae " +
+            "INNER JOIN user ON (user.id,user.fk_apikey) = (ae.fk_user,ae.fk_apikey) " +
+            "WHERE ae.path = CONCAT('/pointScales/',?1) " +
+            "GROUP BY user.id " +
+            "ORDER BY points DESC " +
+            "LIMIT ?2",
             nativeQuery = true)
-    List<Object[]> getLeaderBoard(String apiKey, Integer id, Integer limit);
+    List<LeaderboardDTO> getLeaderBoard(Integer id, Integer limit);
 }

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 address='http://localhost:8080'
 apikey=$(curl --location --request POST "$address/registration" | cut -c11-46)
 

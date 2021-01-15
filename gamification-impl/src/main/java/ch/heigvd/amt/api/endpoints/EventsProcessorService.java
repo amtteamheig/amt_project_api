@@ -82,7 +82,7 @@ public class EventsProcessorService implements EventsApi {
 
         //check rules
         try {
-            handleRules(event,user,apiKeyId);
+            handleRules(event,user,apiKey);
         } catch(ApiException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
@@ -96,9 +96,9 @@ public class EventsProcessorService implements EventsApi {
      * @param user current user
      * @return true if a rule with event type was found
      */
-    private void handleRules(Event event, UserEntity user, String apiKeyId) throws ApiException{
+    private void handleRules(Event event, UserEntity user, ApiKeyEntity apiKey) throws ApiException{
 
-        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(event.getType(),apiKeyId);
+        Optional<RuleEntity> ruleInRep = ruleRepository.findBy_if_TypeAndApiKeyEntityValue(event.getType(),apiKey.getValue());
 
         //if no rules found with given type, return
         if(ruleInRep.isEmpty()){
@@ -116,12 +116,14 @@ public class EventsProcessorService implements EventsApi {
         pointScaleAwardEntity.setTimestamp(event.getTimestamp());
         pointScaleAwardEntity.setAmount(rule.get_then().getAwardPoints().getAmount());
         pointScaleAwardEntity.setUser(user);
+        pointScaleAwardEntity.setApiKeyEntity(apiKey);
 
         //set badge award
         badgeAwardEntity.setPath(rule.get_then().getAwardBadge());
         badgeAwardEntity.setReason(rule.get_if().getType());
         badgeAwardEntity.setTimestamp(event.getTimestamp());
         badgeAwardEntity.setUser(user);
+        badgeAwardEntity.setApiKeyEntity(apiKey);
 
         //save in repos
         pointScaleAwardRepository.save(pointScaleAwardEntity);
