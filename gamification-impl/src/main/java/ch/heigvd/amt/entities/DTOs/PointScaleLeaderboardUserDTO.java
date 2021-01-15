@@ -1,6 +1,6 @@
 package ch.heigvd.amt.entities.DTOs;
 
-public interface LeaderboardDTO {
+public interface PointScaleLeaderboardUserDTO {
     String getUserID();
     int getPoints();
 }
