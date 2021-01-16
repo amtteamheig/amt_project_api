@@ -3,18 +3,11 @@ package ch.heigvd.amt.api.endpoints;
 import ch.heigvd.amt.api.UsersApi;
 import ch.heigvd.amt.api.model.*;
 import ch.heigvd.amt.api.model.User;
-import ch.heigvd.amt.api.model.User;
-import ch.heigvd.amt.api.model.User;
-import ch.heigvd.amt.entities.UserEntity;
-import ch.heigvd.amt.entities.UserEntity;
-import ch.heigvd.amt.entities.UserEntity;
+import ch.heigvd.amt.entities.BadgeEntity;
 import ch.heigvd.amt.entities.UserEntity;
 import ch.heigvd.amt.entities.awards.BadgeAwardEntity;
 import ch.heigvd.amt.entities.awards.PointScaleAwardEntity;
-import ch.heigvd.amt.repositories.ApiKeyRepository;
-import ch.heigvd.amt.repositories.BadgeAwardRepository;
-import ch.heigvd.amt.repositories.PointScaleAwardRepository;
-import ch.heigvd.amt.repositories.UserRepository;
+import ch.heigvd.amt.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.ServletRequest;
-import javax.swing.text.html.Option;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +36,12 @@ public class UsersController implements UsersApi {
     @Autowired
     PointScaleAwardRepository pointScaleAwardRepository;
 
+    @Autowired
+    BadgeRepository badgeRepository;
+
+    @Autowired
+    PointScaleRepository pointScaleRepository;
+
     /**
      * Servlet entry point GET users/id
      * @param id user's Id
@@ -57,7 +55,7 @@ public class UsersController implements UsersApi {
                 userRepository.findByApiKeyEntityValue_AndId(apiKeyId,id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return ResponseEntity.ok(toUser(existingUserEntity,badgeAwardRepository,pointScaleAwardRepository));
+        return ResponseEntity.ok(toUser(existingUserEntity,apiKeyId));
     }
 
     /**
@@ -73,7 +71,7 @@ public class UsersController implements UsersApi {
 
         if (userEntities.isPresent()) {
             for (UserEntity userEntity : userEntities.get()) {
-                users.add(toUser(userEntity,badgeAwardRepository,pointScaleAwardRepository));
+                users.add(toUser(userEntity,apiKeyId));
             }
         }
 
@@ -85,17 +83,17 @@ public class UsersController implements UsersApi {
      * @param entity : user entity
      * @return user
      */
-    public static User toUser(UserEntity entity, BadgeAwardRepository BAR, PointScaleAwardRepository PAR) {
+    public User toUser(UserEntity entity, String apiKeyId) {
         User user = new User();
         user.setId(entity.getId());
 
-        Optional<List<BadgeAwardEntity>> badgesAwardsInRep = BAR.findByUser(entity);
+        Optional<List<BadgeAwardEntity>> badgesAwardsInRep = badgeAwardRepository.findByUser(entity);
         List<BadgeAwardEntity> badgesAwards = new ArrayList<>();
         if(badgesAwardsInRep.isPresent()){
             badgesAwards = badgesAwardsInRep.get();
         }
 
-        Optional<List<PointScaleAwardEntity>> pointScalesAwardsInRep = PAR.findByUser(entity);
+        Optional<List<PointScaleAwardEntity>> pointScalesAwardsInRep = pointScaleAwardRepository.findByUser(entity);
         List<PointScaleAwardEntity> pointScalesAwards = new ArrayList<>();
         if(pointScalesAwardsInRep.isPresent()){
             pointScalesAwards = pointScalesAwardsInRep.get();

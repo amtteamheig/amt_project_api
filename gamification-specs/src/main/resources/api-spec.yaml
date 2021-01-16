@@ -456,6 +456,24 @@ components:
       properties:
         id:
           type: string
+        badgesAmount:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              amount:
+                type: integer
+        pointScalesAmount:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              amount:
+                type: integer
         badgesAwards:
           type: array
           items:
