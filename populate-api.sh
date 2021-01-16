@@ -56,8 +56,8 @@ curl --location --request POST "$address/pointScales" \
 --header 'Content-Type: application/json' \
 --header "x-api-key: $apikey" \
 --data-raw '{
-  "name": "Popularity",
-  "description": "Gain points by owning popular comments or questions"
+  "name": "Curiosity",
+  "description": "Gain points by browsing the website"
 }'
 
 # Getting pointScales locations
@@ -69,15 +69,14 @@ do
    activityPointScaleLocation=${activityPointScaleLocation::-1}
 done
 
-popularityPointScaleLocation=$(expr $activityPointScaleLocation + 1)
+curiosityPointScaleLocation=$(expr $activityPointScaleLocation + 1)
 
 # Creating rules
 
 firstPost="firstPost"
 questionPosted="questionPosted"
 commentPosted="commentPosted"
-rateCommentOrQuestion="rateCommentOrQuestion"
-popularCommentOrQuestion="popularCommentOrQuestion"
+openAQuestion="openAQuestion"
 
 
 curl --location --request POST "$address/rules" \
@@ -88,7 +87,7 @@ curl --location --request POST "$address/rules" \
     \"type\": \"$firstPost\"
   },
   \"then\": {
-    \"awardBadge\": \"/badges/$silverBadgeLocation\",
+    \"awardBadge\": \"/badges/$goldBadgeLocation\",
     \"awardPoints\": {
       \"pointScale\": \"/pointScales/$activityPointScaleLocation\",
       \"amount\": 3
@@ -104,7 +103,7 @@ curl --location --request POST "$address/rules" \
     \"type\": \"$questionPosted\"
   },
   \"then\": {
-    \"awardBadge\": \"/badges/$bronzeBadgeLocation\",
+    \"awardBadge\": \"/badges/$silverBadgeLocation\",
     \"awardPoints\": {
       \"pointScale\": \"/pointScales/$activityPointScaleLocation\",
       \"amount\": 3
@@ -120,7 +119,7 @@ curl --location --request POST "$address/rules" \
     \"type\": \"$commentPosted\"
   },
   \"then\": {
-    \"awardBadge\": \"/badges/$bronzeBadgeLocation\",
+    \"awardBadge\": \"/badges/$silverBadgeLocation\",
     \"awardPoints\": {
       \"pointScale\": \"/pointScales/$activityPointScaleLocation\",
       \"amount\": 2
@@ -133,126 +132,147 @@ curl --location --request POST "$address/rules" \
 --header "x-api-key: $apikey" \
 --data-raw "{
   \"if\": {
-    \"type\": \"$rateCommentOrQuestion\"
+    \"type\": \"$openAQuestion\"
   },
   \"then\": {
     \"awardBadge\": \"/badges/$bronzeBadgeLocation\",
     \"awardPoints\": {
-      \"pointScale\": \"/pointScales/$activityPointScaleLocation\",
+      \"pointScale\": \"/pointScales/$curiosityPointScaleLocation\",
       \"amount\": 1
     }
   }
 }"
 
-curl --location --request POST "$address/rules" \
---header 'Content-Type: application/json' \
---header "x-api-key: $apikey" \
---data-raw "{
-  \"if\": {
-    \"type\": \"$popularCommentOrQuestion\"
-  },
-  \"then\": {
-    \"awardBadge\": \"/badges/$goldBadgeLocation\",
-    \"awardPoints\": {
-      \"pointScale\": \"/pointScales/$popularityPointScaleLocation\",
-      \"amount\": 1
-    }
-  }
-}"
+# check command line arguements
 
-# Events (users)
+if [ $1 == "-u" ]
+then 
 
-user1="1"
-user2="2"
-user3="3"    
+	# Events (users)
 
-#user1
+	user1="1"
+	user2="2"
+	user3="3"    
 
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user1\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$firstPost\"
-}"
+	#user1
 
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user1\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$questionPosted\"
-}"
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user1\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$firstPost\"
+	}"
 
-#user2
-
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user2\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$firstPost\"
-}"
-
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user2\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$commentPosted\"
-}"
-
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user2\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$popularCommentOrQuestion\"
-}"
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user1\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$questionPosted\"
+	}"
+	
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user1\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$openAQuestion\"
+	}"
 
 
-#user3
+	#user2
 
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user3\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$firstPost\"
-}"
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user2\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$firstPost\"
+	}"
 
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user3\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$rateCommentOrQuestion\"
-}"
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user2\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$commentPosted\"
+	}"
 
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user3\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$rateCommentOrQuestion\"
-}"
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user2\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$openAQuestion\"
+	}"
+	
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user2\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$openAQuestion\"
+	}"
 
-curl --location --request POST "$address/events" \
---header "x-api-key: $apikey" \
---header 'Content-Type: application/json' \
---data-raw "{
-  \"userId\": \"$user3\",
-  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
-  \"type\": \"$rateCommentOrQuestion\"
-}"
+
+
+	#user3
+
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user3\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$firstPost\"
+	}"
+
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user3\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$openAQuestion\"
+	}"
+
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user3\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$openAQuestion\"
+	}"
+
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user3\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$openAQuestion\"
+	}"
+
+	curl --location --request POST "$address/events" \
+	--header "x-api-key: $apikey" \
+	--header 'Content-Type: application/json' \
+	--data-raw "{
+	  \"userId\": \"$user3\",
+	  \"timestamp\": \"2020-12-18T09:39:23.676Z\",
+	  \"type\": \"$openAQuestion\"
+	}"
+
+
+fi
 
 # Printing api key
 
