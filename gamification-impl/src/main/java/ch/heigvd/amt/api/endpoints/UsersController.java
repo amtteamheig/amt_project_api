@@ -100,7 +100,21 @@ public class UsersController implements UsersApi {
         User user = new User();
         user.setId(entity.getId());
 
-        
+        //badgesAmounts
+        List<AwardAmountDTO> badgeAwardAmounts = badgeAwardRepository.getAmounts(entity.getId());
+        List<UserBadgesAmount> badgeAmounts = new ArrayList<>();
+        for(AwardAmountDTO badgeAwardAmount : badgeAwardAmounts){
+
+            BadgeEntity badge = badgeRepository.findByApiKeyEntityValue_AndId(apiKey.getValue(),
+                    Long.parseLong(badgeAwardAmount.getPath().substring("/badges/".length())))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+            UserBadgesAmount userPointScaleAmount = new UserBadgesAmount();
+            userPointScaleAmount.setAmount(badgeAwardAmount.getAmount());
+            userPointScaleAmount.setName(badge.getName());
+            badgeAmounts.add(userPointScaleAmount);
+        }
+        user.setBadgesAmount(badgeAmounts);
 
         //pointScaleAmounts
         List<AwardAmountDTO> pointScaleAwardAmounts = pointScaleAwardRepository.getAmounts(entity.getId());
