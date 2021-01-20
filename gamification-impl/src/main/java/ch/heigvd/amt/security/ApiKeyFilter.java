@@ -55,6 +55,10 @@ public class ApiKeyFilter implements Filter {
      * @return true if the URI given is a public ressource
      */
     private boolean isPublicRessource(String URI) {
+        if(URI.startsWith("/swagger-resources"))
+            return true;
+        if(URI.startsWith("/v3/api-docs"))
+            return true;
         if (URI.startsWith("/registration"))
             return true;
         if (URI.equals("/"))
