@@ -12,10 +12,10 @@ services:
     ports :
       - '8080:8080'
     depends_on:
-      - db
+      - db_api
 
   # Database
-  db:
+  db_api:
     image: library/mysql:8
     restart: always
     container_name: 'gamification_db_container'
@@ -32,3 +32,8 @@ services:
       - '3306'
     volumes:
       - ./mysql/:/docker-entrypoint-initdb.d/
+
+networks:
+  default:
+    external:
+      name: amt
