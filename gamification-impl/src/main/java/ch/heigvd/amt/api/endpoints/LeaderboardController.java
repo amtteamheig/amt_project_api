@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.ServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class LeaderboardController implements LeaderboardsApi {
@@ -47,14 +48,15 @@ public class LeaderboardController implements LeaderboardsApi {
         ApiKeyEntity apiKey = apiKeyRepository.findById(apiKeyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        List<PointScaleEntity> pointScalesEntities = pointScaleRepository.findByApiKeyEntityValue(apiKey.getValue())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+        Optional<List<PointScaleEntity>> pointScalesEntities = pointScaleRepository.findByApiKeyEntityValue(apiKey.getValue());
 
         List<PointScaleLeaderboard> psls = new ArrayList<>();
 
-        for(PointScaleEntity pointScaleEntity : pointScalesEntities){
-            List<PointScaleLeaderboardUserDTO> leaderBoard = pointScaleAwardRepository.getLeaderBoard((int)pointScaleEntity.getId(),limit);
-            psls.add(toPointScaleLeaderboard(pointScaleEntity,leaderBoard));
+        if(pointScalesEntities.isPresent()) {
+            for (PointScaleEntity pointScaleEntity : pointScalesEntities.get()) {
+                List<PointScaleLeaderboardUserDTO> leaderBoard = pointScaleAwardRepository.getLeaderBoard((int) pointScaleEntity.getId(), limit);
+                psls.add(toPointScaleLeaderboard(pointScaleEntity, leaderBoard));
+            }
         }
 
         return ResponseEntity.ok(psls);
