@@ -32,3 +32,15 @@ If you want to also create 3 test users, run `./populate-api.sh -u`.
 
 In both cases, you will recieve an API key that you can then use to access your data.
 
+We had trouble making the script work on some MACOS versions, but it works fine on Linux and Windows.
+
+## Cucumber testing
+
+We have tested a lot of things, those include:
+- The apiKey working as intended. In most of the features also tested, we verify that when 2 applications use the feature, they retreive only their data
+- The badges and pointScales features, but also their updates and the checks on the fields. For instance, if a important field is missing when creating a badge, the server should send a 4XX status code
+- The rules features, creation and checks
+- The events, checks if the users are created corretely and the data can be retrieved
+
+You can find all of those tests in the `gamification-specs` folder. Simply run a `mvn clean install` followed by a run of the class ``SpecificationTest``
+

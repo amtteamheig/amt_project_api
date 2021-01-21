@@ -36,7 +36,6 @@ re='^[0-9]+$'
 
 while ! [[ $bronzeBadgeLocation =~ $re ]] 
 do
-   echo $bronzeBadgeLocation
    bronzeBadgeLocation=${bronzeBadgeLocation::-1}
 done
 
