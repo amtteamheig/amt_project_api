@@ -12,6 +12,8 @@ cd gamification-impl/
 mvn spring-boot:run
 ```
 
+You can run this REST API in a docker container with the script `run-app.sh`
+
 You can then access:
 
 * the [API documentation](http://localhost:8080/swagger-ui.html), generated from annotations in the code
