@@ -36,6 +36,7 @@ re='^[0-9]+$'
 
 while ! [[ $bronzeBadgeLocation =~ $re ]] 
 do
+   echo $bronzeBadgeLocation
    bronzeBadgeLocation=${bronzeBadgeLocation::-1}
 done
 
@@ -145,7 +146,7 @@ curl --location --request POST "$address/rules" \
 
 # check command line arguements
 
-if [ $1 == "-u" ]
+if [ $# -eq 1 ] && [ $1 == "-u" ]
 then 
 
 	# Events (users)
